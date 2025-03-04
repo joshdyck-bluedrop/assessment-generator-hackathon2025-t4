@@ -61,7 +61,7 @@ export default function QuizGeneratorPage() {
 
 	// Function to submit the quiz to OpenAI API
 	const handleSubmit = async () => {
-		const res = await fetch("/api/generate-quiz", {
+		const res = await fetch("/api/openai", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(quiz),
@@ -129,31 +129,40 @@ export default function QuizGeneratorPage() {
 						<h3 className="text-lg font-medium">Section {index + 1}</h3>
 
 						{/* Section Title */}
-						<input
-							type="text"
-							placeholder="Section Title"
-							value={section.sectionTitle}
-							onChange={(e) => handleSectionChange(index, "sectionTitle", e.target.value)}
-							className="block mt-2 p-2 border rounded w-full"
-						/>
+						<label className="block text-gray-300 mt-2">
+							Section Title
+							<input
+								type="text"
+								placeholder="Section Title"
+								value={section.sectionTitle}
+								onChange={(e) => handleSectionChange(index, "sectionTitle", e.target.value)}
+								className="block mt-1 p-2 border rounded w-full bg-gray-800 text-white"
+							/>
+						</label>
 
-						{/* Number of Questions */}
-						<input
-							type="number"
-							min="1"
-							placeholder="Number of Questions"
-							value={section.numberOfQuestionsInSection}
-							onChange={(e) => handleSectionChange(index, "numberOfQuestionsInSection", Number(e.target.value))}
-							className="block mt-2 p-2 border rounded w-full"
-						/>
+						{/* Number of Questions with Label */}
+						<label className="block text-gray-300 mt-2">
+							Number of Questions
+							<input
+								type="number"
+								min="1"
+								placeholder="Number of Questions"
+								value={section.numberOfQuestionsInSection}
+								onChange={(e) => handleSectionChange(index, "numberOfQuestionsInSection", Number(e.target.value))}
+								className="block mt-1 p-2 border rounded w-full bg-gray-800 text-white"
+							/>
+						</label>
 
 						{/* Section Content */}
-						<textarea
-							placeholder="Section Content"
-							value={section.sectionContent}
-							onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
-							className="block mt-2 p-2 border rounded w-full h-24"
-						/>
+						<label className="block text-gray-300 mt-2">
+							Section Content
+							<textarea
+								placeholder="Section Content"
+								value={section.sectionContent}
+								onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
+								className="block mt-1 p-2 border rounded w-full h-24 bg-gray-800 text-white"
+							/>
+						</label>
 
 						{/* Remove Section Button (Only for Additional Sections) */}
 						{index > 0 && (

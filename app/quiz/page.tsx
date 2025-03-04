@@ -7,7 +7,6 @@ export default function QuizPage() {
 	const router = useRouter();
 	const [quizData, setQuizData] = useState<any | null>(null);
 	const [userAnswers, setUserAnswers] = useState<{ [key: string]: string[] }>({});
-	const [results, setResults] = useState<any | null>(null);
 	const [submitted, setSubmitted] = useState(false);
 
 	// Load quiz data from localStorage on mount
@@ -20,6 +19,8 @@ export default function QuizPage() {
 
 	// Handle answer selection
 	const handleAnswerChange = (questionTitle: string, answerText: string, isMultiSelect: boolean) => {
+		if (submitted) return; // Prevent changes after submission
+
 		setUserAnswers((prev) => {
 			const currentAnswers = prev[questionTitle] || [];
 			if (isMultiSelect) {
@@ -37,33 +38,13 @@ export default function QuizPage() {
 
 	// Submit answers and calculate results
 	const handleSubmit = () => {
-		let correctCount = 0;
-		const processedResults = quizData.courseSections.flatMap((section: any) =>
-			section.sectionQuestions.map((question: any) => {
-				const userSelected = userAnswers[question.questionTitle] || [];
-				const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
-
-				// Check if all correct answers are selected and no incorrect answers are selected
-				const isCorrect = correctAnswers.length === userSelected.length && userSelected.every((ans) => correctAnswers.includes(ans));
-
-				if (isCorrect) correctCount += 1;
-
-				return {
-					questionTitle: question.questionTitle,
-					answers: question.answers,
-				};
-			})
-		);
-
-		const score = Math.round((correctCount / processedResults.length) * 100);
-		setResults({ score, sectionQuestions: processedResults });
 		setSubmitted(true);
 	};
 
 	if (!quizData) return <p>Loading...</p>;
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto">
+		<div className="p-6 max-w-2xl mx-auto text-white">
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 			{quizData.courseSections.map((section: any, secIndex: number) => (
 				<div key={secIndex} className="mt-4">
@@ -73,32 +54,40 @@ export default function QuizPage() {
 						const isMultiSelect = correctAnswers.length > 1;
 						const userSelected = userAnswers[question.questionTitle] || [];
 
-						const isUserCorrect =
-							submitted &&
-							correctAnswers.length === userSelected.length &&
-							userSelected.every((ans) => correctAnswers.includes(ans));
-
 						return (
-							<div
-								key={qIndex}
-								className={`p-4 mt-2 rounded ${submitted ? (isUserCorrect ? "bg-green-200" : "bg-red-200") : "bg-gray-100"}`}
-							>
+							<div key={qIndex} className="p-4 mt-2 rounded bg-gray-900">
 								<p className="font-medium">{question.questionTitle}</p>
-								<div className="ml-4">
-									{question.answers.map((answer: any, aIndex: number) => (
-										<label key={aIndex} className="block">
-											<input
-												type={isMultiSelect ? "checkbox" : "radio"}
-												name={question.questionTitle}
-												value={answer.answerText}
-												checked={userSelected.includes(answer.answerText)}
-												onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
-												disabled={submitted}
-												className="mr-2"
-											/>
-											{answer.answerText}
-										</label>
-									))}
+								<div className="mt-2">
+									{question.answers.map((answer: any, aIndex: number) => {
+										const isSelected = userSelected.includes(answer.answerText);
+										const isCorrect = correctAnswers.includes(answer.answerText);
+										const isIncorrect = isSelected && !isCorrect;
+
+										return (
+											<label
+												key={aIndex}
+												className={`block p-2 mt-1 rounded cursor-pointer ${
+													submitted
+														? isCorrect
+															? "bg-green-600 text-white"
+															: isIncorrect
+															? "bg-red-600 text-white"
+															: "bg-gray-700 text-gray-300"
+														: "bg-gray-800 text-white"
+												}`}
+											>
+												<input
+													type={isMultiSelect ? "checkbox" : "radio"}
+													name={question.questionTitle}
+													value={answer.answerText}
+													checked={isSelected}
+													readOnly // Ensures input is disabled and view-only after submission
+													className="mr-2"
+												/>
+												{answer.answerText}
+											</label>
+										);
+									})}
 								</div>
 							</div>
 						);

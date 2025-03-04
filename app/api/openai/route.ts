@@ -34,32 +34,45 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 		}
 
-		const prompt = `
-			You are an AI quiz generator. Your task is to generate quiz questions based on provided course sections.
-			
-			### Quiz Details:
-			- **Title**: ${quizTitle}
-			- **Audience**: ${quizAudience}
-			- **Difficulty**: ${quizDifficulty}
-			- **Answer Type**: ${multipleOrSingleAnswers === "multiple" ? "Multiple-choice (1-4 correct answers)" : "Single correct answer"}
-
-			### Instructions:
-			For each section, generate exactly the requested number of questions. Each question should:
-			- Match the specified difficulty: "${quizDifficulty}"
-			- Have a title that fits the section content.
-			- If **multiple answers** are allowed, randomly generate between 1 to 4 correct answers.
-			- If **single answer** is chosen, ensure only one correct answer.
-			- Answers should be relevant and well-thought-out.
-
-			### Course Sections:
-			${courseSections.map((section: any, index: any) => `
-			**Section ${index + 1}: ${section.sectionTitle}**
-			- Content: ${section.sectionContent}
-			- Number of Questions: ${section.numberOfQuestionsInSection}
-			`).join("\n\n")}
-			
-			Return the completed JSON object with each section containing generated questions.
-		`;
+        const prompt = `
+            You are an AI quiz generator. Your task is to generate quiz questions in **strict JSON format**. Do not include any explanations.
+            
+            ### Input Details:
+            - **Title**: ${quizTitle}
+            - **Audience**: ${quizAudience}
+            - **Difficulty**: ${quizDifficulty}
+            - **Answer Type**: ${multipleOrSingleAnswers === "multiple" ? "Multiple-choice (1-4 correct answers)" : "Single correct answer"}
+            
+            ### Instructions:
+            1. Generate exactly the requested number of questions per section.
+            2. Each question should:
+            - Match the difficulty level: "${quizDifficulty}".
+            - Have a relevant question title.
+            - If **multiple answers**, include **1-4 correct answers**.
+            - If **single answer**, ensure only **one correct answer**.
+            3. **Return the result as valid JSON without extra text.**
+            4. **DO NOT** include markdown formatting (such as \\ \`\\ \`\\ \`json \\ \`\\ \`\\ \`).
+            5. **DO NOT** include explanations or extra words.
+            
+            ### Example JSON Output Format:
+            {
+            "quizTitle": "${quizTitle}",
+            "courseSections": [
+                {
+                "sectionTitle": "Section Title Here",
+                "sectionQuestions": [
+                    {
+                    "questionTitle": "Generated Question Here",
+                    "answers": [
+                        { "isCorrect": true, "answerText": "Correct Answer" },
+                        { "isCorrect": false, "answerText": "Incorrect Answer" }
+                    ]
+                    }
+                ]
+                }
+            ]
+            }
+        `;
 
 		const response = await openai.chat.completions.create({
 			model: "gpt-4",
