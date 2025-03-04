@@ -167,6 +167,68 @@ export default function QuizGeneratorPage() {
 		}));
 	};
 
+
+	const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+	// List of witty slow-loading messages
+	const wittyLoadingPhrases = [
+		"Wow, that’s sure taking a month of Tuesdays to load...",
+		"I could've baked a cake by now. And eaten it too.",
+		"Is it just me, or did I age a little waiting for this?",
+		"I think the AI went on a coffee break... without me.",
+		"I’ve seen glaciers move faster than this.",
+		"Did we accidentally ask it to solve world peace too?",
+		"Pretty sure my internet is fine, so what’s the holdup?",
+		"At this rate, I might actually have time to learn the subject myself.",
+		"Did we just time-travel back to dial-up speeds?",
+		"Wow, I didn’t realize generating a quiz required a quantum computer.",
+		"Let me guess—it's buffering my patience away.",
+		"Okay AI, any day now… no rush… but also hurry up.",
+		"Should I be worried? Did the AI ghost us?",
+		"Maybe if I stare at it harder, it’ll go faster.",
+		"Alright, who unplugged the AI’s brain?",
+		"I swear I saw a snail overtake this loading bar.",
+		"Just tell me straight, do I need to refresh?",
+		"Don’t mind me, just watching paint dry while I wait.",
+		"If I had a dollar for every second this took, I’d be rich.",
+		"Did the AI just fall asleep mid-calculation?",
+		"This better be the best quiz of all time for the wait.",
+		"At this rate, I could go write the questions myself.",
+		"Oh cool, an infinite loading screen—my favorite.",
+		"This is taking so long, I might start questioning reality.",
+		"Are we generating a quiz or launching a spaceship?",
+		"Time flies when you’re having fun. So clearly, time has stopped.",
+	];
+
+		// Start playing a witty complaint if loading takes longer than 5 seconds
+		useEffect(() => {
+			if (!isSubmitting) return;
+	
+			const timeout = setTimeout(async () => {
+				const randomPhrase =
+					wittyLoadingPhrases[Math.floor(Math.random() * wittyLoadingPhrases.length)];
+	
+				try {
+					const res = await fetch("/api/complaint-generator", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ text: randomPhrase }),
+					});
+	
+					if (!res.ok) throw new Error("Failed to fetch audio");
+	
+					const audioUrl = URL.createObjectURL(await res.blob());
+					const newAudio = new Audio(audioUrl);
+					setAudio(newAudio);
+					newAudio.play();
+				} catch (error) {
+					console.error("TTS Error:", error);
+				}
+			}, 5000); // 5 seconds delay before triggering TTS
+	
+			return () => clearTimeout(timeout);
+		}, [isSubmitting]);
+
 	// Function to submit the quiz to OpenAI API
 	const handleSubmit = async () => {
 		setIsSubmitting(true); // Show overlay and disable interactions
@@ -185,6 +247,12 @@ export default function QuizGeneratorPage() {
 			router.push("/quiz");
 		} finally {
 			setIsSubmitting(false); // Hide overlay after request completion
+
+			// Stop any playing TTS audio when submission completes
+			if (audio) {
+				audio.pause();
+				audio.currentTime = 0;
+			}			
 		}
 	};
 
