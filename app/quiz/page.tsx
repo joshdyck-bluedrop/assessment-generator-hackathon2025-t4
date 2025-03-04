@@ -109,7 +109,13 @@ export default function QuizPage() {
 	return (
 		<div className="p-6 max-w-2xl mx-auto text-white relative">
 			{/* 🎉 Confetti Animation Overlay */}
-			{showConfetti && <div className="confetti-container"></div>}
+			{showConfetti && (
+				<div className="confetti-container">
+					{[...Array(150)].map((_, i) => (
+						<div key={i} className="confetti"></div>
+					))}
+				</div>
+			)}
 
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 

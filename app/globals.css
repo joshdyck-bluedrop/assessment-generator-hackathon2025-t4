@@ -33,3 +33,48 @@ body {
 .pulse-opacity {
   animation: fadeInOut 1.5s infinite ease-in-out;
 }
+
+
+/* CONFETTI ANIMATION STYLES */
+
+@keyframes confetti-fall {
+  0% {
+      transform: translateY(-100vh) rotateZ(0deg);
+      opacity: 1;
+  }
+  100% {
+      transform: translateY(100vh) rotateZ(720deg);
+      opacity: 0;
+  }
+}
+
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.confetti {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--confetti-color, #ffcc00);
+  opacity: 0;
+  animation: confetti-fall linear infinite;
+  border-radius: 50%;
+}
+
+/* Generate way more confetti pieces */
+@for $i from 1 through 50 {
+  .confetti:nth-child(#{$i}) {
+      left: calc(2% * #{$i});
+      --confetti-color: hsl(calc(360deg * #{$i} / 50), 100%, 60%);
+      animation-duration: calc(2s + 2 * random());
+      animation-delay: calc(0.1s * random());
+  }
+}
