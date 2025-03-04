@@ -46,7 +46,7 @@ export default function QuizPage() {
 				const userSelected = userAnswers[question.questionTitle] || [];
 				const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
 
-				// Check if the user selected all correct answers and no incorrect ones
+				// Check if all correct answers are selected and no incorrect ones
 				const isCorrect = correctAnswers.length === userSelected.length && userSelected.every((ans) => correctAnswers.includes(ans));
 
 				if (isCorrect) correctCount += 1;
@@ -68,6 +68,27 @@ export default function QuizPage() {
 		setScore(calculatedScore);
 		setResults({ score: calculatedScore, sectionQuestions: processedResults });
 		setSubmitted(true);
+	};
+
+	// ✅ Function to Download JSON Results
+	const downloadResultsAsJSON = () => {
+		if (!results) return;
+		const jsonData = JSON.stringify(results, null, 2);
+		const blob = new Blob([jsonData], { type: "application/json" });
+		const url = URL.createObjectURL(blob);
+
+		// Format file name with current date
+		const currentDate = new Date().toISOString().split("T")[0];
+		const fileName = `quiz-results-${currentDate}.json`;
+
+		// Create a link and trigger the download
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = fileName;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	};
 
 	if (!quizData) return <p>Loading...</p>;
@@ -141,6 +162,14 @@ export default function QuizPage() {
 						<h2 className="text-lg font-semibold">Results</h2>
 						<pre className="text-xs overflow-x-auto">{JSON.stringify(results, null, 2)}</pre>
 					</div>
+
+					{/* ✅ Download JSON Button */}
+					<button
+						onClick={downloadResultsAsJSON}
+						className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
+					>
+						Download JSON
+					</button>
 
 					{/* Generate New Quiz Button */}
 					<button
