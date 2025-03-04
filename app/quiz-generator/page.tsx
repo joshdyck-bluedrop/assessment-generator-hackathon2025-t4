@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface CourseSection {
@@ -16,11 +16,35 @@ export default function QuizGeneratorPage() {
 		quizAudience: "",
 		quizDifficulty: "balanced mix of simple and challenging",
 		multipleOrSingleAnswers: "single",
-		courseSections: [
-			{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }
-		],
+		courseSections: [{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }],
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [loadingMessage, setLoadingMessage] = useState("Generating your quiz...");
+
+	// List of rotating loading messages
+	const loadingPhrases = [
+		"Determining the specs...",
+		"Running the numbers...",
+		"Doing hard things...",
+		"Summoning the quiz spirits...",
+		"Consulting the AI overlords...",
+		"Shuffling the question deck...",
+		"Optimizing brain puzzles...",
+		"Thinking really hard...",
+	];
+
+	// Cycle through loading messages every 2 seconds
+	useEffect(() => {
+		if (!isSubmitting) return;
+
+		let index = 0;
+		const interval = setInterval(() => {
+			setLoadingMessage(loadingPhrases[index]);
+			index = (index + 1) % loadingPhrases.length;
+		}, 2000);
+
+		return () => clearInterval(interval);
+	}, [isSubmitting]);
 
 	// Function to handle input changes
 	const handleInputChange = (field: string, value: string | number) => {
@@ -32,7 +56,7 @@ export default function QuizGeneratorPage() {
 
 	// Function to handle section input changes
 	const handleSectionChange = (index: number, field: keyof CourseSection, value: string | number) => {
-		const updatedSections: any = [...quiz.courseSections];
+		const updatedSections = [...quiz.courseSections];
 		updatedSections[index][field] = value as any;
 		setQuiz((prev) => ({
 			...prev,
@@ -44,10 +68,7 @@ export default function QuizGeneratorPage() {
 	const addNewSection = () => {
 		setQuiz((prev) => ({
 			...prev,
-			courseSections: [
-				...prev.courseSections,
-				{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }
-			],
+			courseSections: [...prev.courseSections, { sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }],
 		}));
 	};
 
@@ -202,10 +223,11 @@ export default function QuizGeneratorPage() {
 				Generate Quiz
 			</button>
 
-			{/* Overlay with Spinner (Shown During Submission) */}
+			{/* Overlay with Spinner and Text (Shown During Submission) */}
 			{isSubmitting && (
-				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+				<div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75 z-50">
 					<div className="border-4 border-gray-200 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
+					<p className="mt-4 text-white text-lg font-semibold">{loadingMessage}</p>
 				</div>
 			)}
 		</div>
