@@ -1,5 +1,6 @@
 "use client";
 
+import confetti from "canvas-confetti";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -11,8 +12,7 @@ export default function QuizPage() {
 	const [score, setScore] = useState<number | null>(null);
 	const [results, setResults] = useState<any | null>(null);
 	const [showConfetti, setShowConfetti] = useState(false);
-
-	const [encouragementAudio, setEncouragementAudio] = useState<HTMLAudioElement | null>(null);
+	const [encouragementInterval, setEncouragementInterval] = useState<NodeJS.Timeout | null>(null);
 
     // 🎙️ List of encouragement phrases
     const encouragementPhrases = [
@@ -28,47 +28,57 @@ export default function QuizPage() {
         "Amazing effort! You're on fire!"
     ];
 
-    // 🔊 Function to fetch and play TTS audio
-    const fetchAndPlayEncouragement = async () => {
-        const phrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
-        console.log("Playing encouragement:", phrase);
+	const finalAffirmations = [
+		"You are awesome!",
+		"Great job, you did amazing!",
+		"You are a quiz master!",
+		"That was fantastic!",
+		"You're smarter than a supercomputer!",
+		"High five to you!",
+		"You're a genius!",
+	];
 
-        try {
-            const response = await fetch("/api/tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: phrase }),
-            });
+	// Play a random encouragement phrase every 10-20 seconds while the quiz is ongoing
+	useEffect(() => {
+		if (submitted) {
+			if (encouragementInterval) clearInterval(encouragementInterval);
+			return;
+		}
 
-            if (!response.ok) throw new Error("Failed to fetch TTS");
+		const playEncouragement = () => {
+			const randomPhrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
+			playTextToSpeech(randomPhrase);
+		};
 
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            setEncouragementAudio(audio);
-            audio.play();
+		// Random interval between 10 and 20 seconds
+		const interval = setInterval(() => {
+			playEncouragement();
+		}, Math.floor(Math.random() * (20000 - 10000) + 10000));
 
-            audio.onended = () => URL.revokeObjectURL(audioUrl); // Clean up after playing
-        } catch (error) {
-            console.error("Error fetching TTS:", error);
-        }
-    };
+		setEncouragementInterval(interval);
 
-    // 🎶 Play a random encouragement every 10-20 seconds
-    useEffect(() => {
-        const playEncouragement = () => {
-            fetchAndPlayEncouragement();
-            const nextInterval = Math.random() * (20000 - 10000) + 10000; // 10-20 seconds
-            return setTimeout(playEncouragement, nextInterval);
-        };
+		return () => clearInterval(interval);
+	}, [submitted]);
 
-        const interval = playEncouragement();
+	// Function to fetch and play TTS from the API
+	const playTextToSpeech = async (text: string) => {
+		try {
+			const response = await fetch("/api/tts", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ text }),
+			});
 
-        return () => {
-            clearTimeout(interval);
-            if (encouragementAudio) encouragementAudio.pause();
-        };
-    }, []);
+			if (!response.ok) throw new Error("TTS API failed");
+
+			const audioBlob = await response.blob();
+			const audioUrl = URL.createObjectURL(audioBlob);
+			const audio = new Audio(audioUrl);
+			audio.play();
+		} catch (error) {
+			console.error("Error playing TTS:", error);
+		}
+	};
 
 	// Load quiz data from localStorage on mount
 	useEffect(() => {
@@ -131,8 +141,20 @@ export default function QuizPage() {
 		// 🎉 Show confetti if score is 100%
 		if (calculatedScore === 100) {
 			setShowConfetti(true);
+
+			// Trigger confetti animation
+			confetti({
+				particleCount: 350,
+				spread: 100,
+				origin: { y: 0.6 },
+			});
+
 			setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
 		}
+
+		// 🗣 Play final affirmation
+		const finalPhrase = finalAffirmations[Math.floor(Math.random() * finalAffirmations.length)];
+		playTextToSpeech(finalPhrase);
 	};
 
 	// ✅ Function to Download JSON Results
@@ -167,13 +189,8 @@ export default function QuizPage() {
 	return (
 		<div className="p-6 max-w-2xl mx-auto text-white relative">
 			{/* 🎉 Confetti Animation Overlay */}
-			{showConfetti && (
-				<div className="confetti-container">
-					{[...Array(150)].map((_, i) => (
-						<div key={i} className="confetti"></div>
-					))}
-				</div>
-			)}
+			{showConfetti && <div className="confetti-container"></div>}
+
 
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 
