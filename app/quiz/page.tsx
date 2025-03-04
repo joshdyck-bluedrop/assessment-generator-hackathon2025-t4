@@ -155,13 +155,13 @@ export default function QuizPage() {
 			{submitted && (
 				<div className="mt-8">
 					{/* Large SCORE Display */}
-					<h1 className="text-5xl font-bold text-center">SCORE: {score}%</h1>
+					<h1 className="text-6xl font-bold text-center">SCORE: {score}%</h1>
 
 					{/* Results in Preformatted JSON Format */}
-					<div className="mt-4 p-4 bg-gray-800 rounded">
+					{/* <div className="mt-4 p-4 bg-gray-800 rounded">
 						<h2 className="text-lg font-semibold">Results</h2>
 						<pre className="text-xs overflow-x-auto">{JSON.stringify(results, null, 2)}</pre>
-					</div>
+					</div> */}
 
 					{/* ✅ Download JSON Button */}
 					<button
