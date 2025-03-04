@@ -20,6 +20,7 @@ export default function QuizGeneratorPage() {
 			{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }
 		],
 	});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// Function to handle input changes
 	const handleInputChange = (field: string, value: string | number) => {
@@ -61,22 +62,27 @@ export default function QuizGeneratorPage() {
 
 	// Function to submit the quiz to OpenAI API
 	const handleSubmit = async () => {
-		const res = await fetch("/api/openai", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(quiz),
-		});
-		const generatedQuiz = await res.json();
+		setIsSubmitting(true); // Show overlay and disable interactions
+		try {
+			const res = await fetch("/api/openai", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(quiz),
+			});
+			const generatedQuiz = await res.json();
 
-		// Save quiz data in localStorage
-		localStorage.setItem("quizData", JSON.stringify(generatedQuiz));
+			// Save quiz data in localStorage
+			localStorage.setItem("quizData", JSON.stringify(generatedQuiz));
 
-		// Navigate to the quiz page
-		router.push("/quiz");
+			// Navigate to the quiz page
+			router.push("/quiz");
+		} finally {
+			setIsSubmitting(false); // Hide overlay after request completion
+		}
 	};
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto">
+		<div className="p-6 max-w-2xl mx-auto relative">
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
 
 			{/* Quiz Title */}
@@ -134,10 +140,7 @@ export default function QuizGeneratorPage() {
 			<div className="mt-4">
 				<h2 className="text-xl font-semibold">Sections</h2>
 				{quiz.courseSections.map((section, index) => (
-					<div
-						key={index} 
-						className="mt-4 p-4 border-2 border-white rounded-lg bg-black text-white"
-					>
+					<div key={index} className="mt-4 p-4 border-2 border-white rounded-lg bg-black text-white">
 						<h3 className="text-lg font-medium">Section {index + 1}</h3>
 
 						{/* Section Title */}
@@ -152,7 +155,7 @@ export default function QuizGeneratorPage() {
 							/>
 						</label>
 
-						{/* Number of Questions with Label */}
+						{/* Number of Questions */}
 						<label className="block text-gray-300 mt-2">
 							Number of Questions
 							<input
@@ -189,21 +192,22 @@ export default function QuizGeneratorPage() {
 				))}
 
 				{/* Add New Section Button */}
-				<button
-					onClick={addNewSection}
-					className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-				>
+				<button onClick={addNewSection} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
 					Add New Section
 				</button>
 			</div>
 
 			{/* Generate Quiz Button */}
-			<button
-				onClick={handleSubmit}
-				className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-			>
+			<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
 				Generate Quiz
 			</button>
+
+			{/* Overlay with Spinner (Shown During Submission) */}
+			{isSubmitting && (
+				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+					<div className="border-4 border-gray-200 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
+				</div>
+			)}
 		</div>
 	);
 }
