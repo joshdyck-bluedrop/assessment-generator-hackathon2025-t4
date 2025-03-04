@@ -24,3 +24,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.pulse-opacity {
+  animation: fadeInOut 1.5s infinite ease-in-out;
+}
