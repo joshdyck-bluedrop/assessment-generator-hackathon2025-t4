@@ -224,7 +224,7 @@ export default function QuizGeneratorPage() {
 				} catch (error) {
 					console.error("TTS Error:", error);
 				}
-			}, 5000); // 5 seconds delay before triggering TTS
+			}, 8000); // 5 seconds delay before triggering TTS
 	
 			return () => clearTimeout(timeout);
 		}, [isSubmitting]);
