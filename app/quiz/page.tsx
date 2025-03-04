@@ -98,7 +98,13 @@ export default function QuizPage() {
 		URL.revokeObjectURL(url);
 	};
 
-	if (!quizData || !quizData.courseSections) <p>Loading...</p>;
+	if (!quizData || !quizData.courseSections) {
+		return (
+			<div className="flex items-center justify-center h-screen w-full">
+				<p className="text-white text-xl pulse-opacity">Loading...</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="p-6 max-w-2xl mx-auto text-white relative">
