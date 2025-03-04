@@ -10,6 +10,7 @@ export default function QuizPage() {
 	const [submitted, setSubmitted] = useState(false);
 	const [score, setScore] = useState<number | null>(null);
 	const [results, setResults] = useState<any | null>(null);
+	const [showConfetti, setShowConfetti] = useState(false);
 
 	// Load quiz data from localStorage on mount
 	useEffect(() => {
@@ -68,6 +69,12 @@ export default function QuizPage() {
 		setScore(calculatedScore);
 		setResults({ score: calculatedScore, sectionQuestions: processedResults });
 		setSubmitted(true);
+
+		// 🎉 Show confetti if score is 100%
+		if (calculatedScore === 100) {
+			setShowConfetti(true);
+			setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
+		}
 	};
 
 	// ✅ Function to Download JSON Results
@@ -94,8 +101,13 @@ export default function QuizPage() {
 	if (!quizData) return <p>Loading...</p>;
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto text-white">
+		<div className="p-6 max-w-2xl mx-auto text-white relative">
+			{/* 🎉 Confetti Animation Overlay */}
+			{showConfetti && <div className="confetti-container"></div>}
+
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
+
+			{/* Quiz Content */}
 			{quizData.courseSections.map((section: any, secIndex: number) => (
 				<div key={secIndex} className="mt-4">
 					<h2 className="text-xl font-semibold">{section.sectionTitle}</h2>
@@ -146,6 +158,7 @@ export default function QuizPage() {
 				</div>
 			))}
 
+			{/* Submit & Results */}
 			{!submitted && (
 				<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
 					Submit Answers
@@ -171,11 +184,7 @@ export default function QuizPage() {
 						Download JSON
 					</button>
 
-					{/* Generate New Quiz Button */}
-					<button
-						onClick={() => router.push("/quiz-generator")}
-						className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full"
-					>
+					<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full">
 						Generate New Quiz
 					</button>
 				</div>
