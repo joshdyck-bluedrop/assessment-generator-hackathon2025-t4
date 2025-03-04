@@ -124,10 +124,9 @@ export default function QuizGeneratorPage() {
 	useEffect(() => {
 		if (!isSubmitting) return;
 
-		let index = 0;
 		const interval = setInterval(() => {
-			setLoadingMessage(loadingPhrases[index]);
-			index = (index + 1) % loadingPhrases.length;
+			const randomIndex = Math.floor(Math.random() * loadingPhrases.length);
+			setLoadingMessage(loadingPhrases[randomIndex]);
 		}, 2000);
 
 		return () => clearInterval(interval);
