@@ -98,7 +98,7 @@ export default function QuizPage() {
 		URL.revokeObjectURL(url);
 	};
 
-	if (!quizData) return <p>Loading...</p>;
+	if (!quizData || !quizData.courseSections) <p>Loading...</p>;
 
 	return (
 		<div className="p-6 max-w-2xl mx-auto text-white relative">
@@ -108,7 +108,7 @@ export default function QuizPage() {
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 
 			{/* Quiz Content */}
-			{quizData.courseSections.map((section: any, secIndex: number) => (
+			{quizData?.courseSections?.map((section: any, secIndex: number) => (
 				<div key={secIndex} className="mt-4">
 					<h2 className="text-xl font-semibold">{section.sectionTitle}</h2>
 					{section.sectionQuestions.map((question: any, qIndex: number) => {
