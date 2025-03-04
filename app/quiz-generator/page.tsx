@@ -191,57 +191,60 @@ export default function QuizGeneratorPage() {
 	return (
 		<div className="p-6 max-w-2xl mx-auto relative">
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
+			<br />
+			<h2 className="text-xl font-semibold">Quiz Options</h2>
+			<div className="bg-gray-900 p-4 border border-gray-500 rounded-lg mt-4">
+				{/* Quiz Title */}
+				<label className="block text-gray-300 mt-2">
+					Quiz Title
+					<input
+						type="text"
+						placeholder="Quiz Title"
+						value={quiz.quizTitle}
+						onChange={(e) => handleInputChange("quizTitle", e.target.value)}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full"
+					/>
+				</label>
 
-			{/* Quiz Title */}
-			<label className="block text-gray-300 mt-2">
-				Quiz Title
-				<input
-					type="text"
-					placeholder="Quiz Title"
-					value={quiz.quizTitle}
-					onChange={(e) => handleInputChange("quizTitle", e.target.value)}
-					className="block mt-2 p-2 border border-gray-500 rounded w-full"
-				/>
-			</label>
+				{/* Quiz Audience */}
+				<label className="block text-gray-300 mt-2">
+					Target Audience Description
+					<input
+						type="text"
+						placeholder="Target Audience"
+						value={quiz.quizAudience}
+						onChange={(e) => handleInputChange("quizAudience", e.target.value)}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full"
+					/>
+				</label>
 
-			{/* Quiz Audience */}
-			<label className="block text-gray-300 mt-2">
-				Target Audience Description
-				<input
-					type="text"
-					placeholder="Target Audience"
-					value={quiz.quizAudience}
-					onChange={(e) => handleInputChange("quizAudience", e.target.value)}
-					className="block mt-2 p-2 border border-gray-500 rounded w-full"
-				/>
-			</label>
+				{/* Quiz Difficulty */}
+				<label className="block text-gray-300 mt-2">
+					Quiz Difficulty
+					<select
+						value={quiz.quizDifficulty}
+						onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full"
+					>
+						<option value="simple">Simple</option>
+						<option value="challenging">Challenging</option>
+						<option value="balanced mix of simple and challenging">Balanced Mix</option>
+					</select>
+				</label>
 
-			{/* Quiz Difficulty */}
-			<label className="block text-gray-300 mt-2">
-				Quiz Difficulty
-				<select
-					value={quiz.quizDifficulty}
-					onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-					className="block mt-2 p-2 border border-gray-500 rounded w-full"
-				>
-					<option value="simple">Simple</option>
-					<option value="challenging">Challenging</option>
-					<option value="balanced mix of simple and challenging">Balanced Mix</option>
-				</select>
-			</label>
-
-			{/* Answer Type */}
-			<label className="block text-gray-300 mt-2">
-				Number of Answers
-				<select
-					value={quiz.multipleOrSingleAnswers}
-					onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
-					className="block mt-2 p-2 border border-gray-500 rounded w-full"
-				>
-					<option value="single">Single Answer</option>
-					<option value="multiple">Multiple Answers</option>
-				</select>
-			</label>
+				{/* Answer Type */}
+				<label className="block text-gray-300 mt-2">
+					Number of Answers
+					<select
+						value={quiz.multipleOrSingleAnswers}
+						onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full"
+					>
+						<option value="single">Single Answer</option>
+						<option value="multiple">Multiple Answers</option>
+					</select>
+				</label>
+			</div>
 
 			{/* Sections */}
 			<div className="mt-4">
@@ -300,12 +303,15 @@ export default function QuizGeneratorPage() {
 
 				{/* Add New Section Button */}
 				<button onClick={addNewSection} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-					＋ Add New Section
+					＋ Add Section
 				</button>
 			</div>
 
+			<br />
+			<br />
+
 			{/* Generate Quiz Button */}
-			<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+			<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
 				Generate Quiz
 			</button>
 
