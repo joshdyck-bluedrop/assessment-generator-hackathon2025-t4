@@ -300,11 +300,11 @@ export default function QuizPage() {
 						onClick={downloadResultsAsJSON}
 						className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
 					>
-						Download JSON
+						⬇ Download JSON
 					</button>
 
 					<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full">
-						Generate New Quiz
+						🔄 Generate New Quiz
 					</button>
 				</div>
 			)}
