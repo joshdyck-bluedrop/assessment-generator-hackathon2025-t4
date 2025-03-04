@@ -4,6 +4,42 @@ import confetti from "canvas-confetti";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+const launchConfetti = () => {
+	confetti({
+		particleCount: 500, // More confetti particles
+		spread: 160, // Wider spread
+		startVelocity: 40, // Initial velocity
+		scalar: 1.2, // Slightly larger confetti pieces
+		origin: { x: 0.5, y: 0 }, // Start from the top center
+		gravity: 0.8, // Makes it float longer
+		ticks: 200, // Makes it last longer
+		colors: ["#ff0", "#0ff", "#f00", "#0f0", "#00f", "#fff"],
+	});
+
+	// Trigger multiple bursts for a full effect
+	setTimeout(() => {
+		confetti({
+			particleCount: 500,
+			spread: 160,
+			startVelocity: 100,
+			origin: { x: 0.3, y: 0 }, // Left side
+			gravity: 0.9,
+			ticks: 250,
+		});
+	}, 300);
+
+	setTimeout(() => {
+		confetti({
+			particleCount: 500,
+			spread: 160,
+			startVelocity: 90,
+			origin: { x: 0.7, y: 0 }, // Right side
+			gravity: 0.9,
+			ticks: 250,
+		});
+	}, 600);
+};
+
 export default function QuizPage() {
 	const router = useRouter();
 	const [quizData, setQuizData] = useState<any | null>(null);
@@ -141,15 +177,11 @@ export default function QuizPage() {
 		// 🎉 Show confetti if score is 100%
 		if (calculatedScore === 100) {
 			setShowConfetti(true);
-
+			
 			// Trigger confetti animation
-			confetti({
-				particleCount: 350,
-				spread: 100,
-				origin: { y: 0.6 },
-			});
+			launchConfetti();
 
-			setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
+			setTimeout(() => setShowConfetti(false), 10000); // Hide confetti after 5 seconds
 		}
 
 		// 🗣 Play final affirmation
