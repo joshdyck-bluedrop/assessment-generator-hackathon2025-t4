@@ -56,7 +56,7 @@ export default function QuizGeneratorPage() {
 
 	// Function to handle section input changes
 	const handleSectionChange = (index: number, field: keyof CourseSection, value: string | number) => {
-		const updatedSections = [...quiz.courseSections];
+		const updatedSections: any = [...quiz.courseSections];
 		updatedSections[index][field] = value as any;
 		setQuiz((prev) => ({
 			...prev,
