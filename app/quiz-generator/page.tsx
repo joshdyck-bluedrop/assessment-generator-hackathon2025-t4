@@ -50,6 +50,15 @@ export default function QuizGeneratorPage() {
 		}));
 	};
 
+	// Remove a section (but not the first one)
+	const removeSection = (index: number) => {
+		if (index === 0) return; // Prevent removing the first section
+		setQuiz((prev) => ({
+			...prev,
+			courseSections: prev.courseSections.filter((_, i) => i !== index),
+		}));
+	};
+
 	// Function to submit the quiz to OpenAI API
 	const handleSubmit = async () => {
 		const res = await fetch("/api/generate-quiz", {
@@ -145,6 +154,16 @@ export default function QuizGeneratorPage() {
 							onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
 							className="block mt-2 p-2 border rounded w-full h-24"
 						/>
+
+						{/* Remove Section Button (Only for Additional Sections) */}
+						{index > 0 && (
+							<button
+								onClick={() => removeSection(index)}
+								className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+							>
+								Remove Section
+							</button>
+						)}
 					</div>
 				))}
 
