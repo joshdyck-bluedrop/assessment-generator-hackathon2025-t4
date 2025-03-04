@@ -73,7 +73,7 @@ export default function QuizPage() {
 															: isIncorrect
 															? "bg-red-600 text-white"
 															: "bg-gray-700 text-gray-300"
-														: "bg-gray-800 text-white"
+														: "bg-gray-800 text-white hover:bg-gray-700"
 												}`}
 											>
 												<input
@@ -81,7 +81,8 @@ export default function QuizPage() {
 													name={question.questionTitle}
 													value={answer.answerText}
 													checked={isSelected}
-													readOnly // Ensures input is disabled and view-only after submission
+													onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
+													disabled={submitted} // Disable after submission
 													className="mr-2"
 												/>
 												{answer.answerText}
