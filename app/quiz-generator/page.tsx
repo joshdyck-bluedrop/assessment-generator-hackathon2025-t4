@@ -200,7 +200,7 @@ export default function QuizGeneratorPage() {
 					placeholder="Quiz Title"
 					value={quiz.quizTitle}
 					onChange={(e) => handleInputChange("quizTitle", e.target.value)}
-					className="block mt-2 p-2 border rounded w-full"
+					className="block mt-2 p-2 border border-gray-500 rounded w-full"
 				/>
 			</label>
 
@@ -212,7 +212,7 @@ export default function QuizGeneratorPage() {
 					placeholder="Target Audience"
 					value={quiz.quizAudience}
 					onChange={(e) => handleInputChange("quizAudience", e.target.value)}
-					className="block mt-2 p-2 border rounded w-full"
+					className="block mt-2 p-2 border border-gray-500 rounded w-full"
 				/>
 			</label>
 
@@ -222,7 +222,7 @@ export default function QuizGeneratorPage() {
 				<select
 					value={quiz.quizDifficulty}
 					onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-					className="block mt-2 p-2 border rounded w-full"
+					className="block mt-2 p-2 border border-gray-500 rounded w-full"
 				>
 					<option value="simple">Simple</option>
 					<option value="challenging">Challenging</option>
@@ -236,7 +236,7 @@ export default function QuizGeneratorPage() {
 				<select
 					value={quiz.multipleOrSingleAnswers}
 					onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
-					className="block mt-2 p-2 border rounded w-full"
+					className="block mt-2 p-2 border border-gray-500 rounded w-full"
 				>
 					<option value="single">Single Answer</option>
 					<option value="multiple">Multiple Answers</option>
@@ -247,7 +247,7 @@ export default function QuizGeneratorPage() {
 			<div className="mt-4">
 				<h2 className="text-xl font-semibold">Sections</h2>
 				{quiz.courseSections.map((section, index) => (
-					<div key={index} className="mt-4 p-4 border-2 border-white rounded-lg bg-black text-white">
+					<div key={index} className="mt-4 p-4 border border-gray-500 bg-gray-900 rounded-lg text-white">
 						<h3 className="text-lg font-medium">Section {index + 1}</h3>
 
 						{/* Section Title */}
@@ -258,7 +258,7 @@ export default function QuizGeneratorPage() {
 								placeholder="Section Title"
 								value={section.sectionTitle}
 								onChange={(e) => handleSectionChange(index, "sectionTitle", e.target.value)}
-								className="block mt-1 p-2 border rounded w-full bg-gray-800 text-white"
+								className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
 							/>
 						</label>
 
@@ -271,7 +271,7 @@ export default function QuizGeneratorPage() {
 								placeholder="Number of Questions"
 								value={section.numberOfQuestionsInSection}
 								onChange={(e) => handleSectionChange(index, "numberOfQuestionsInSection", Number(e.target.value))}
-								className="block mt-1 p-2 border rounded w-full bg-gray-800 text-white"
+								className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
 							/>
 						</label>
 
@@ -282,7 +282,7 @@ export default function QuizGeneratorPage() {
 								placeholder="Section Content"
 								value={section.sectionContent}
 								onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
-								className="block mt-1 p-2 border rounded w-full h-24 bg-gray-800 text-white"
+								className="block mt-1 p-2 border border-gray-500 rounded w-full h-24 bg-gray-800 text-white"
 							/>
 						</label>
 
@@ -300,7 +300,7 @@ export default function QuizGeneratorPage() {
 
 				{/* Add New Section Button */}
 				<button onClick={addNewSection} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-					Add New Section
+					＋ Add New Section
 				</button>
 			</div>
 
