@@ -80,43 +80,55 @@ export default function QuizGeneratorPage() {
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
 
 			{/* Quiz Title */}
-			<input
-				type="text"
-				placeholder="Quiz Title"
-				value={quiz.quizTitle}
-				onChange={(e) => handleInputChange("quizTitle", e.target.value)}
-				className="block mt-2 p-2 border rounded w-full"
-			/>
+			<label className="block text-gray-300 mt-2">
+				Quiz Title
+				<input
+					type="text"
+					placeholder="Quiz Title"
+					value={quiz.quizTitle}
+					onChange={(e) => handleInputChange("quizTitle", e.target.value)}
+					className="block mt-2 p-2 border rounded w-full"
+				/>
+			</label>
 
 			{/* Quiz Audience */}
-			<input
-				type="text"
-				placeholder="Target Audience"
-				value={quiz.quizAudience}
-				onChange={(e) => handleInputChange("quizAudience", e.target.value)}
-				className="block mt-2 p-2 border rounded w-full"
-			/>
+			<label className="block text-gray-300 mt-2">
+				Target Audience Description
+				<input
+					type="text"
+					placeholder="Target Audience"
+					value={quiz.quizAudience}
+					onChange={(e) => handleInputChange("quizAudience", e.target.value)}
+					className="block mt-2 p-2 border rounded w-full"
+				/>
+			</label>
 
 			{/* Quiz Difficulty */}
-			<select
-				value={quiz.quizDifficulty}
-				onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-				className="block mt-2 p-2 border rounded w-full"
-			>
-				<option value="simple">Simple</option>
-				<option value="challenging">Challenging</option>
-				<option value="balanced mix of simple and challenging">Balanced Mix</option>
-			</select>
+			<label className="block text-gray-300 mt-2">
+				Quiz Difficulty
+				<select
+					value={quiz.quizDifficulty}
+					onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
+					className="block mt-2 p-2 border rounded w-full"
+				>
+					<option value="simple">Simple</option>
+					<option value="challenging">Challenging</option>
+					<option value="balanced mix of simple and challenging">Balanced Mix</option>
+				</select>
+			</label>
 
 			{/* Answer Type */}
-			<select
-				value={quiz.multipleOrSingleAnswers}
-				onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
-				className="block mt-2 p-2 border rounded w-full"
-			>
-				<option value="single">Single Answer</option>
-				<option value="multiple">Multiple Answers</option>
-			</select>
+			<label className="block text-gray-300 mt-2">
+				Number of Answers
+				<select
+					value={quiz.multipleOrSingleAnswers}
+					onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
+					className="block mt-2 p-2 border rounded w-full"
+				>
+					<option value="single">Single Answer</option>
+					<option value="multiple">Multiple Answers</option>
+				</select>
+			</label>
 
 			{/* Sections */}
 			<div className="mt-4">
