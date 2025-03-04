@@ -8,6 +8,8 @@ export default function QuizPage() {
 	const [quizData, setQuizData] = useState<any | null>(null);
 	const [userAnswers, setUserAnswers] = useState<{ [key: string]: string[] }>({});
 	const [submitted, setSubmitted] = useState(false);
+	const [score, setScore] = useState<number | null>(null);
+	const [results, setResults] = useState<any | null>(null);
 
 	// Load quiz data from localStorage on mount
 	useEffect(() => {
@@ -38,6 +40,33 @@ export default function QuizPage() {
 
 	// Submit answers and calculate results
 	const handleSubmit = () => {
+		let correctCount = 0;
+		const processedResults = quizData.courseSections.flatMap((section: any) =>
+			section.sectionQuestions.map((question: any) => {
+				const userSelected = userAnswers[question.questionTitle] || [];
+				const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
+
+				// Check if the user selected all correct answers and no incorrect ones
+				const isCorrect = correctAnswers.length === userSelected.length && userSelected.every((ans) => correctAnswers.includes(ans));
+
+				if (isCorrect) correctCount += 1;
+
+				return {
+					questionTitle: question.questionTitle,
+					answers: question.answers.map((answer: any) => ({
+						answerText: answer.answerText,
+						isCorrect: answer.isCorrect,
+						isSelected: userSelected.includes(answer.answerText),
+					})),
+				};
+			})
+		);
+
+		const totalQuestions = processedResults.length;
+		const calculatedScore = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+		setScore(calculatedScore);
+		setResults({ score: calculatedScore, sectionQuestions: processedResults });
 		setSubmitted(true);
 	};
 
@@ -78,7 +107,7 @@ export default function QuizPage() {
 											>
 												<input
 													type={isMultiSelect ? "checkbox" : "radio"}
-													name={question.questionTitle}
+													name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : question.questionTitle} // Unique names for checkboxes
 													value={answer.answerText}
 													checked={isSelected}
 													onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
@@ -103,9 +132,24 @@ export default function QuizPage() {
 			)}
 
 			{submitted && (
-				<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-					Generate New Quiz
-				</button>
+				<div className="mt-8">
+					{/* Large SCORE Display */}
+					<h1 className="text-5xl font-bold text-center">SCORE: {score}%</h1>
+
+					{/* Results in Preformatted JSON Format */}
+					<div className="mt-4 p-4 bg-gray-800 rounded">
+						<h2 className="text-lg font-semibold">Results</h2>
+						<pre className="text-xs overflow-x-auto">{JSON.stringify(results, null, 2)}</pre>
+					</div>
+
+					{/* Generate New Quiz Button */}
+					<button
+						onClick={() => router.push("/quiz-generator")}
+						className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full"
+					>
+						Generate New Quiz
+					</button>
+				</div>
 			)}
 		</div>
 	);
