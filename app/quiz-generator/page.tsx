@@ -113,7 +113,10 @@ export default function QuizGeneratorPage() {
 			<div className="mt-4">
 				<h2 className="text-xl font-semibold">Sections</h2>
 				{quiz.courseSections.map((section, index) => (
-					<div key={index} className="mt-4 p-4 border rounded bg-gray-100">
+					<div
+						key={index} 
+						className="mt-4 p-4 border-2 border-white rounded-lg bg-black text-white"
+					>
 						<h3 className="text-lg font-medium">Section {index + 1}</h3>
 
 						{/* Section Title */}
