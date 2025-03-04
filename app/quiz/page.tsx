@@ -12,6 +12,64 @@ export default function QuizPage() {
 	const [results, setResults] = useState<any | null>(null);
 	const [showConfetti, setShowConfetti] = useState(false);
 
+	const [encouragementAudio, setEncouragementAudio] = useState<HTMLAudioElement | null>(null);
+
+    // 🎙️ List of encouragement phrases
+    const encouragementPhrases = [
+        "You're doing great! Keep it up!",
+        "Stay focused, you're almost there!",
+        "You got this! Believe in yourself!",
+        "You're a quiz master in the making!",
+        "Keep pushing! Every question counts!",
+        "Nice work! Let's keep going!",
+        "You're crushing it! Don't stop now!",
+        "Great job! Keep up the momentum!",
+        "You're unstoppable! Keep going strong!",
+        "Amazing effort! You're on fire!"
+    ];
+
+    // 🔊 Function to fetch and play TTS audio
+    const fetchAndPlayEncouragement = async () => {
+        const phrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
+        console.log("Playing encouragement:", phrase);
+
+        try {
+            const response = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: phrase }),
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch TTS");
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            setEncouragementAudio(audio);
+            audio.play();
+
+            audio.onended = () => URL.revokeObjectURL(audioUrl); // Clean up after playing
+        } catch (error) {
+            console.error("Error fetching TTS:", error);
+        }
+    };
+
+    // 🎶 Play a random encouragement every 10-20 seconds
+    useEffect(() => {
+        const playEncouragement = () => {
+            fetchAndPlayEncouragement();
+            const nextInterval = Math.random() * (20000 - 10000) + 10000; // 10-20 seconds
+            return setTimeout(playEncouragement, nextInterval);
+        };
+
+        const interval = playEncouragement();
+
+        return () => {
+            clearTimeout(interval);
+            if (encouragementAudio) encouragementAudio.pause();
+        };
+    }, []);
+
 	// Load quiz data from localStorage on mount
 	useEffect(() => {
 		const storedQuiz = localStorage.getItem("quizData");
