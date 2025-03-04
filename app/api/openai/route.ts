@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         7. **Return the result as a valid JSON object** without any extra text.
         
         ### Course Sections & Questions:
-        ${courseSections.map((section, index) => `
+        ${courseSections.map((section: any, index: any) => `
         - **Section ${index + 1}: ${section.sectionTitle}**
           - Content: "${section.sectionContent}"
           - Number of Questions: ${section.numberOfQuestionsInSection}
