@@ -9,25 +9,9 @@ interface CourseSection {
 	sectionContent: string;
 }
 
-const defaultValues = {
-		quizTitle: "Title",
-		quizAudience: "Children",
-		quizDifficulty: "balanced mix of simple and challenging",
-		multipleOrSingleAnswers: "single",
-		courseSections: [
-			{
-				sectionTitle: "Moon",
-				numberOfQuestionsInSection: 5,
-				sectionContent:
-					"The Moon is Earth's only natural satellite, orbiting at an average distance of 384399 km (238,854 mi; about 30 times Earth's diameter). It faces Earth always with the same side. This is a result of Earth's gravitational pull having synchronized the Moon's rotation period (lunar day) with its orbital period (lunar month) of 29.5 Earth days. The Moon's pull on Earth is the main driver of Earth's tides.",
-			},
-		],
-		apiModel: 'openai',
-}
-
 export default function QuizGeneratorPage() {
 	const router = useRouter();
-	const [quiz, setQuiz] = useState(defaultValues || {
+	const [quiz, setQuiz] = useState({
 		quizTitle: "",
 		quizAudience: "",
 		quizDifficulty: "balanced mix of simple and challenging",
