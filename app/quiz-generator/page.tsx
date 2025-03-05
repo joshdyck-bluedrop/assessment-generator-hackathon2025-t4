@@ -291,8 +291,8 @@ export default function QuizGeneratorPage() {
 					<select
 						value={quiz.quizDifficulty}
 						onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full"
-					>
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						>
 						<option value="simple">Simple</option>
 						<option value="challenging">Challenging</option>
 						<option value="balanced mix of simple and challenging">Balanced Mix</option>
