@@ -60,6 +60,8 @@ export async function POST(req: Request) {
         13: Randomly shuffle the correct answer(s) among the incorrect answers to ensure their positions are unpredictable.
         14: Make sure the correct answer is not in the same order relative to the incorrect answer.
         15. Incorrect answer options must be of similar complexity and sentence length to the correct answer to avoid easy detection by user.
+        16. If Answer Type from input details is **multiple answers**, include **1-4 correct answers** and ensure that at least one question has more than one answer.
+        17. If Answer Type from input details is **single answer**, ensure only **one correct answer**.
         
         ### Course Sections & Questions:
         ${courseSections.map((section: any, index: any) => `

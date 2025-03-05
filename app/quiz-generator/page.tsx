@@ -333,8 +333,8 @@ export default function QuizGeneratorPage() {
 						value={quiz.multipleOrSingleAnswers}
 						onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
 						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"					>
-						<option value="single">Single Answer</option>
-						<option value="multiple">Multiple Answers</option>
+						<option value="single">Single Answers Only</option>
+						<option value="multiple">Allow Multiple Answers</option>
 					</select>
 				</label>
 			</div>
