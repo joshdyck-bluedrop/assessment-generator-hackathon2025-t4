@@ -51,7 +51,8 @@ export async function POST(req: Request) {
         4. **DO NOT** alter the number of questions per section. Each section must have exactly the requested number of questions.
         5. **DO NOT** include any explanations or additional text in the output.
         6. **DO NOT** include markdown formatting (such as \`\`\`json).
-        7. **Return the result as a valid JSON object** without any extra text.
+        7. **DO NOT** allow duplicate questions.
+        8. **Return the result as a valid JSON object** without any extra text.
         
         ### Course Sections & Questions:
         ${courseSections.map((section: any, index: any) => `

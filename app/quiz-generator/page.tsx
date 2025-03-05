@@ -183,7 +183,6 @@ export default function QuizGeneratorPage() {
 		"Did we just time-travel back to dial-up speeds?",
 		"Wow, I didn’t realize generating a quiz required a quantum computer.",
 		"Let me guess—it's buffering my patience away.",
-		"Okay AI, any day now… no rush… but also hurry up.",
 		"Should I be worried? Did the AI ghost us?",
 		"Maybe if I stare at it harder, it’ll go faster.",
 		"Alright, who unplugged the AI’s brain?",
