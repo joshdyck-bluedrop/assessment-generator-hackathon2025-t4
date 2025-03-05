@@ -53,6 +53,7 @@ export async function POST(req: Request) {
         6. **DO NOT** include markdown formatting (such as \`\`\`json).
         7. **DO NOT** allow duplicate questions.
         8. **Return the result as a valid JSON object** without any extra text.
+        9. **Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
         
         ### Course Sections & Questions:
         ${courseSections.map((section: any, index: any) => `
