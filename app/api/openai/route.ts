@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         6. **DO NOT** include markdown formatting (such as \`\`\`json).
         7. **DO NOT** allow duplicate questions.
         8. **Return the result as a valid JSON object** without any extra text.
-        9. **Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
+        9. Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
         10. Question difficulty of challenging from input details means that answers should be more abstract and inferred based on multiple facts from the sectionContent and not directly listed as a fact in sectionContent.
         11. Question difficulty of simple from input details means that answers should be taken directly from sectionContent.
         12. Question difficulty value of "balanced mix of simple and challenging" from input details means that answers should be an even mix of answers inferred from the sectionContent and answers taken directly from the sectionContent.
