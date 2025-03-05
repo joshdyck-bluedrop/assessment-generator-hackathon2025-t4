@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Papa from "papaparse";
 
 interface CourseSection {
 	sectionTitle: string;
@@ -17,7 +18,7 @@ export default function QuizGeneratorPage() {
 		quizDifficulty: "balanced mix of simple and challenging",
 		multipleOrSingleAnswers: "single",
 		courseSections: [{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }],
-		apiModel: 'openai',
+		apiModel: "openai",
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState("Generating your quiz...");
@@ -193,66 +194,112 @@ export default function QuizGeneratorPage() {
 		}));
 	};
 
-
 	const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
-	// List of witty slow-loading messages
-	const wittyLoadingPhrases = [
-		"Wow, that’s sure taking a month of Tuesdays to load...",
-		"I could've baked a cake by now. And eaten it too.",
-		"Is it just me, or did I age a little waiting for this?",
-		"I think the AI went on a coffee break... without me.",
-		"I’ve seen glaciers move faster than this.",
-		"Did we accidentally ask it to solve world peace too?",
-		"Pretty sure my internet is fine, so what’s the holdup?",
-		"At this rate, I might actually have time to learn the subject myself.",
-		"Did we just time-travel back to dial-up speeds?",
-		"Wow, I didn’t realize generating a quiz required a quantum computer.",
-		"Let me guess—it's buffering my patience away.",
-		"Should I be worried? Did the AI ghost us?",
-		"Maybe if I stare at it harder, it’ll go faster.",
-		"Alright, who unplugged the AI’s brain?",
-		"I swear I saw a snail overtake this loading bar.",
-		"Just tell me straight, do I need to refresh?",
-		"Don’t mind me, just watching paint dry while I wait.",
-		"If I had a dollar for every second this took, I’d be rich.",
-		"Did the AI just fall asleep mid-calculation?",
-		"This better be the best quiz of all time for the wait.",
-		"At this rate, I could go write the questions myself.",
-		"Oh cool, an infinite loading screen—my favorite.",
-		"This is taking so long, I might start questioning reality.",
-		"Are we generating a quiz or launching a spaceship?",
-		"Time flies when you’re having fun. So clearly, time has stopped.",
-	];
+	// Start playing a witty complaint if loading takes longer than 5 seconds
+	useEffect(() => {
+		if (!isSubmitting) return;
 
-		// Start playing a witty complaint if loading takes longer than 5 seconds
-		useEffect(() => {
-			if (!isSubmitting) return;
-	
-			const timeout = setTimeout(async () => {
-				const randomPhrase =
-					wittyLoadingPhrases[Math.floor(Math.random() * wittyLoadingPhrases.length)];
-	
-				try {
-					const res = await fetch("/api/complaint-generator", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ text: randomPhrase }),
-					});
-	
-					if (!res.ok) throw new Error("Failed to fetch audio");
-	
-					const audioUrl = URL.createObjectURL(await res.blob());
-					const newAudio = new Audio(audioUrl);
-					setAudio(newAudio);
-					newAudio.play();
-				} catch (error) {
-					console.error("TTS Error:", error);
-				}
-			}, 8000); // 5 seconds delay before triggering TTS
-	
-			return () => clearTimeout(timeout);
-		}, [isSubmitting]);
+		const randomNumber = Math.floor(Math.random() * (12000 - 8000 + 1)) + 8000;
+		const roundedNumber = Math.round(randomNumber / 1000) * 1000;
+		// List of witty slow-loading messages
+		const wittyLoadingPhrases = [
+			"Wow, that’s sure taking a month of Tuesdays to load...",
+			"I could've baked a cake by now. And eaten it too.",
+			"Is it just me, or did I age a little waiting for this?",
+			"I think the AI went on a coffee break... without me.",
+			"I’ve seen glaciers move faster than this.",
+			"Did we accidentally ask it to solve world peace too?",
+			"Pretty sure my internet is fine, so what’s the holdup?",
+			"At this rate, I might actually have time to learn the subject myself.",
+			"Did we just time-travel back to dial-up speeds?",
+			"Wow, I didn’t realize generating a quiz required a quantum computer.",
+			"Let me guess—it's buffering my patience away.",
+			"Should I be worried? Did the AI ghost us?",
+			"Maybe if I stare at it harder, it’ll go faster.",
+			"Alright, who unplugged the AI’s brain?",
+			"I swear I saw a snail overtake this loading bar.",
+			"Just tell me straight, do I need to refresh?",
+			"Don’t mind me, just watching paint dry while I wait.",
+			`If I had a dollar for every second this took, I’d... have ${roundedNumber/1000} dollars. Worth it? Nah.`,
+			"Did the AI just fall asleep mid-calculation?",
+			"This better be the best quiz of all time for the wait.",
+			"At this rate, I could go write the questions myself.",
+			"Oh cool, an infinite loading screen—my favorite.",
+			"This is taking so long, I might start questioning reality.",
+			"Are we generating a quiz or launching a spaceship?",
+			"Time flies when you’re having fun. So clearly, time has stopped.",
+		];
+
+		const timeout = setTimeout(async () => {
+
+			const randomPhrase =
+				wittyLoadingPhrases[Math.floor(Math.random() * wittyLoadingPhrases.length)];
+
+			try {
+				const res = await fetch("/api/complaint-generator", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ text: randomPhrase }),
+				});
+
+				if (!res.ok) throw new Error("Failed to fetch audio");
+
+				const audioUrl = URL.createObjectURL(await res.blob());
+				const newAudio = new Audio(audioUrl);
+				setAudio(newAudio);
+				newAudio.play();
+			} catch (error) {
+				console.error("TTS Error:", error);
+			}
+		}, randomNumber); // randomized delay before complaint fires
+
+		return () => clearTimeout(timeout);
+	}, [isSubmitting]);
+
+	// ** CSV UPLOAD HANDLER **
+	const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		// Read the file
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			if (!e.target?.result) return;
+			const csvText = e.target.result.toString();
+
+			// Parse CSV using PapaParse
+			Papa.parse(csvText, {
+				header: false,
+				skipEmptyLines: true,
+				complete: (results: any) => {
+					const data: string[][] = results.data as string[][];
+
+					// Check if any row has more than 2 columns
+					const invalidRow = data.find((row) => row.length > 2);
+					if (invalidRow) {
+						alert("Incorrect CSV format: Each row should have only two columns (Section Name and Section Content).");
+						return;
+					}
+
+					// Format sections
+					const parsedSections = data.map(([sectionTitle, sectionContent]) => ({
+						sectionTitle,
+						numberOfQuestionsInSection: 5, // Default to 5 questions per section
+						sectionContent,
+					}));
+
+					// Update state
+					setQuiz((prev) => ({
+						...prev,
+						courseSections: parsedSections,
+					}));
+				},
+			});
+		};
+
+		reader.readAsText(file);
+	};
 
 	// Function to submit the quiz to OpenAI API
 	const handleSubmit = async (e: FormEvent) => {
@@ -288,6 +335,47 @@ export default function QuizGeneratorPage() {
 		<form onSubmit={handleSubmit} className="p-6 max-w-2xl mx-auto relative">
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
 			<br />
+
+			{/* CSV Upload with Floating Example */}
+			<div className="relative group inline-block">
+				<label className="block mb-4">
+					<span className="text-white font-semibold">Upload CSV:</span>
+					<input
+						type="file"
+						accept=".csv"
+						onChange={handleCSVUpload}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+					/>
+				</label>
+
+				{/* Floating Dialog with Example CSV & Dark Drop Shadow */}
+				<div className="absolute left-0 top-full mt-2 w-[400px] bg-gray-900 text-white border border-white rounded-lg shadow-lg shadow-black p-4 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 z-50">
+					<h2 className="text-xl font-semibold mb-2">Expected CSV Format:</h2>
+					<table className="w-full border border-gray-600 text-left">
+						<thead>
+							<tr className="bg-gray-800">
+								<th className="border border-gray-600 p-2">Section Name</th>
+								<th className="border border-gray-600 p-2">Section Content</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr className="bg-gray-900">
+								<td className="border border-gray-600 p-2">Alien Invasion Tactics</td>
+								<td className="border border-gray-600 p-2">How to diplomatically negotiate with extraterrestrials.</td>
+							</tr>
+							<tr className="bg-gray-800">
+								<td className="border border-gray-600 p-2">Mastering the Art of Napping</td>
+								<td className="border border-gray-600 p-2">Techniques to sleep anywhere, anytime.</td>
+							</tr>
+							<tr className="bg-gray-900">
+								<td className="border border-gray-600 p-2">How to Outsmart a Goldfish</td>
+								<td className="border border-gray-600 p-2">A deep dive into memory training for fish lovers.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
 			<div className="flex justify-between">
 				<h2 className="text-xl font-semibold">Quiz Options</h2>
 				<div className="flex items-center gap-2">
