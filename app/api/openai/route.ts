@@ -54,6 +54,12 @@ export async function POST(req: Request) {
         7. **DO NOT** allow duplicate questions.
         8. **Return the result as a valid JSON object** without any extra text.
         9. **Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
+        10. Question difficulty of challenging from input details means that answers should be more abstract and inferred based on multiple facts from the sectionContent and not directly listed as a fact in sectionContent.
+        11. Question difficulty of simple from input details means that answers should be taken directly from sectionContent.
+        12. Question difficulty value of "balanced mix of simple and challenging" from input details means that answers should be an even mix of answers inferred from the sectionContent and answers taken directly from the sectionContent.
+        13: Randomly shuffle the correct answer(s) among the incorrect answers to ensure their positions are unpredictable.
+        14: Make sure the correct answer is not in the same order relative to the incorrect answer.
+        15. Incorrect answer options must be of similar complexity and sentence length to the correct answer to avoid easy detection by user.
         
         ### Course Sections & Questions:
         ${courseSections.map((section: any, index: any) => `
@@ -72,8 +78,8 @@ export async function POST(req: Request) {
                 {
                   "questionTitle": "Generated question based ONLY on the section content",
                   "answers": [
-                    { "isCorrect": true, "answerText": "Correct Answer" },
-                    { "isCorrect": false, "answerText": "Incorrect Answer" }
+                    // object with "isCorrect": true must be in random order in array, and most often in a different position for each question
+                    { "isCorrect": boolean, "answerText": "'Correct Answer' if isCorrect is true OR 'Incorrect Answer' if isCorrect is false" },
                   ]
                 }
               ]
