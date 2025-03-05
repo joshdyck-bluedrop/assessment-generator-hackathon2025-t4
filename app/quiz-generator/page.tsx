@@ -266,11 +266,11 @@ export default function QuizGeneratorPage() {
 			<div className="flex justify-between">
 				<h2 className="text-xl font-semibold">Quiz Options</h2>
 				<div className="flex items-center gap-2">
-					<p className="font-bold">Select AI:</p>
+					<p className="font-bold">Select&nbsp;AI:</p>
 					<select
 						value={quiz.apiModel}
 						onChange={(e) => handleInputChange("apiModel", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						className="block p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
 					>
 						<option value="openai">Open AI</option>
 						<option value="gemini">Gemini</option>
