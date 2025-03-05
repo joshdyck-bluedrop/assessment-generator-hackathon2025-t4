@@ -226,7 +226,7 @@ export default function QuizGeneratorPage() {
 			"At this rate, I could go write the questions myself.",
 			"Oh cool, an infinite loading screen—my favorite.",
 			"This is taking so long, I might start questioning reality.",
-			"Are we generating a quiz or launching a spaceship?",
+			"Are we generating a quiz or launching a spaceship? T minus eternity and counting...",
 			"Time flies when you’re having fun. So clearly, time has stopped.",
 		];
 
