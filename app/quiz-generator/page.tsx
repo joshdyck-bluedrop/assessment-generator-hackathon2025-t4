@@ -342,6 +342,7 @@ export default function QuizGeneratorPage() {
 						<label className="block text-gray-300 mt-2">
 							Section Title
 							<input
+								required
 								type="text"
 								placeholder="Section Title"
 								value={section.sectionTitle}
@@ -367,6 +368,7 @@ export default function QuizGeneratorPage() {
 						<label className="block text-gray-300 mt-2">
 							Section Content
 							<textarea
+								required
 								placeholder="Section Content"
 								value={section.sectionContent}
 								onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}

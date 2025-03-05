@@ -266,7 +266,7 @@ export default function QuizPage() {
 													disabled={submitted} // Disable after submission
 													className="mr-2"
 												/>
-												{answer.answerText}
+												{answer.answerText} {submitted && isSelected && '(Your Answer)'}
 											</label>
 										);
 									})}
