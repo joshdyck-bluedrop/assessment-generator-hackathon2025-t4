@@ -200,7 +200,6 @@ export default function QuizGeneratorPage() {
 		"Did we just time-travel back to dial-up speeds?",
 		"Wow, I didn’t realize generating a quiz required a quantum computer.",
 		"Let me guess—it's buffering my patience away.",
-		"Okay AI, any day now… no rush… but also hurry up.",
 		"Should I be worried? Did the AI ghost us?",
 		"Maybe if I stare at it harder, it’ll go faster.",
 		"Alright, who unplugged the AI’s brain?",
@@ -327,8 +326,8 @@ export default function QuizGeneratorPage() {
 					<select
 						value={quiz.quizDifficulty}
 						onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full"
-					>
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						>
 						<option value="simple">Simple</option>
 						<option value="challenging">Challenging</option>
 						<option value="balanced mix of simple and challenging">Balanced Mix</option>
@@ -341,8 +340,7 @@ export default function QuizGeneratorPage() {
 					<select
 						value={quiz.multipleOrSingleAnswers}
 						onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full"
-					>
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"					>
 						<option value="single">Single Answer</option>
 						<option value="multiple">Multiple Answers</option>
 					</select>

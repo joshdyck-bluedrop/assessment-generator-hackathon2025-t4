@@ -70,7 +70,7 @@ export default function QuizPage() {
 		"You are a quiz master!",
 		"That was fantastic!",
 		"You're smarter than a supercomputer!",
-		"High five to you!",
+		"I'm speechless, high five to you!",
 		"You're a genius!",
 	];
 
@@ -259,7 +259,7 @@ export default function QuizPage() {
 											>
 												<input
 													type={isMultiSelect ? "checkbox" : "radio"}
-													name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : question.questionTitle} // Unique names for checkboxes
+													name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : `question-${secIndex}-${qIndex}`}
 													value={answer.answerText}
 													checked={isSelected}
 													onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
