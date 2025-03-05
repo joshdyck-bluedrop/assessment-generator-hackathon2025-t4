@@ -107,6 +107,20 @@ export default function QuizPage() {
 	
 			return () => clearInterval(interval);
 		}, [sectionImages]);
+	const answerSelectionPhrases = [
+    "Good choice!",
+    "Interesting selection!",
+    "Let's see how that works out!",
+    "Hmm, that's an answer!",
+    "Bold move!",
+    "I see what you're thinking!",
+    "Let's go with that one!",
+    "That's one way to look at it!",
+    "Nice pick!",
+    "Let's lock that in!",
+		"Are you sure about that?",
+];
+
 
 	// Play a random encouragement phrase every 10-20 seconds while the quiz is ongoing
 	useEffect(() => {
@@ -131,12 +145,18 @@ export default function QuizPage() {
 	}, [submitted]);
 
 	// Function to fetch and play TTS from the API
-	const playTextToSpeech = async (text: string) => {
+	const availableVoices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer", "ash"]; // 🎙️ Available voices for random selection
+
+	const playTextToSpeech = async (text: string, randomizeVoice = false) => {
 		try {
+			const selectedVoice = randomizeVoice
+				? availableVoices[Math.floor(Math.random() * availableVoices.length)] // ✅ Pick a random voice if required
+				: "coral"; // Default voice for non-randomized speech
+
 			const response = await fetch("/api/tts", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text }),
+				body: JSON.stringify({ text, voice: selectedVoice }), // ✅ Send selected voice
 			});
 
 			if (!response.ok) throw new Error("TTS API failed");
@@ -159,23 +179,45 @@ export default function QuizPage() {
 	}, []);
 
 	// Handle answer selection
+	const [lastSpokenTrigger, setLastSpokenTrigger] = useState<number>(0); // Used to trigger TTS without duplicates
+
 	const handleAnswerChange = (questionTitle: string, answerText: string, isMultiSelect: boolean) => {
 		if (submitted) return; // Prevent changes after submission
 
 		setUserAnswers((prev) => {
 			const currentAnswers = prev[questionTitle] || [];
+			let newAnswers = [];
+
 			if (isMultiSelect) {
 				// Toggle multi-select answer
-				const newAnswers = currentAnswers.includes(answerText)
+				newAnswers = currentAnswers.includes(answerText)
 					? currentAnswers.filter((a) => a !== answerText)
-					: [...currentAnswers, answerText];
-				return { ...prev, [questionTitle]: newAnswers };
+						: [...currentAnswers, answerText];
 			} else {
 				// Single select (radio buttons)
-				return { ...prev, [questionTitle]: [answerText] };
-			}
+				newAnswers = [answerText];
+				}
+				return { ...prev, [questionTitle]: newAnswers };
 		});
+		// Increment trigger to activate useEffect
+		setLastSpokenTrigger((prev) => prev + 1);
 	};
+
+	// 🔊 Play random phrases
+	useEffect(() => {
+			if (lastSpokenTrigger === 0) return;
+
+			const getRandomPhrase = () => {
+					if (submitted) {
+							return finalAffirmations[Math.floor(Math.random() * finalAffirmations.length)];
+					} else {
+							return answerSelectionPhrases[Math.floor(Math.random() * answerSelectionPhrases.length)];
+					}
+			};
+
+			const randomPhrase = getRandomPhrase();
+			playTextToSpeech(randomPhrase);
+	}, [lastSpokenTrigger]); // Runs every time a new answer is selected
 
 	// Submit answers and calculate results
 	const handleSubmit = () => {
