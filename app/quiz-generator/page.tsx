@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 interface CourseSection {
@@ -17,6 +17,7 @@ export default function QuizGeneratorPage() {
 		quizDifficulty: "balanced mix of simple and challenging",
 		multipleOrSingleAnswers: "single",
 		courseSections: [{ sectionTitle: "", numberOfQuestionsInSection: 5, sectionContent: "" }],
+		apiModel: 'openai',
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState("Generating your quiz...");
@@ -230,10 +231,13 @@ export default function QuizGeneratorPage() {
 		}, [isSubmitting]);
 
 	// Function to submit the quiz to OpenAI API
-	const handleSubmit = async () => {
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
 		setIsSubmitting(true); // Show overlay and disable interactions
 		try {
-			const res = await fetch("/api/openai", {
+			console.log('here', quiz.apiModel);
+			
+			const res = await fetch(`/api/${quiz.apiModel}`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(quiz),
@@ -257,15 +261,29 @@ export default function QuizGeneratorPage() {
 	};
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto relative">
+		<form onSubmit={handleSubmit} className="p-6 max-w-2xl mx-auto relative">
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
 			<br />
-			<h2 className="text-xl font-semibold">Quiz Options</h2>
+			<div className="flex justify-between">
+				<h2 className="text-xl font-semibold">Quiz Options</h2>
+				<div className="flex items-center gap-2">
+					<p className="font-bold">Select AI:</p>
+					<select
+						value={quiz.apiModel}
+						onChange={(e) => handleInputChange("apiModel", e.target.value)}
+					>
+						<option value="openai">Open AI</option>
+						<option value="gemini">Gemini</option>
+					</select>
+				</div>
+			</div>
+
 			<div className="bg-gray-900 p-4 border border-gray-500 rounded-lg mt-4">
 				{/* Quiz Title */}
 				<label className="block text-gray-300 mt-2">
 					Quiz Title
 					<input
+						required
 						type="text"
 						placeholder="Quiz Title"
 						value={quiz.quizTitle}
@@ -278,6 +296,7 @@ export default function QuizGeneratorPage() {
 				<label className="block text-gray-300 mt-2">
 					Target Audience Description
 					<input
+						required
 						type="text"
 						placeholder="Target Audience"
 						value={quiz.quizAudience}
@@ -379,7 +398,7 @@ export default function QuizGeneratorPage() {
 			<br />
 
 			{/* Generate Quiz Button */}
-			<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
+			<button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
 				Generate Quiz
 			</button>
 
@@ -390,6 +409,6 @@ export default function QuizGeneratorPage() {
 					<p className="mt-4 text-white text-lg font-semibold">{loadingMessage}</p>
 				</div>
 			)}
-		</div>
+		</form>
 	);
 }
