@@ -74,7 +74,7 @@ export default function QuizPage() {
 		"You are a quiz master!",
 		"That was fantastic!",
 		"You're smarter than a supercomputer!",
-		"I'm speechless, I mean, wow!",
+		"I'm speechless, I mean... wow!",
 		"You're a genius!",
 	];
 
