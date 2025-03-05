@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         5. **DO NOT** include any explanations or additional text in the output.
         6. **DO NOT** include markdown formatting (such as \`\`\`json).
         7. **DO NOT** allow duplicate questions.
-        8. **Return the result as a valid JSON object** without any extra text.
+        8. **Return the result as a valid JSON object** without any extra text, headers, or explanations.
         9. Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
         10. Question difficulty of challenging from input details means that answers should be more abstract and inferred based on multiple facts from the sectionContent and not directly listed as a fact in sectionContent.
         11. Question difficulty of simple from input details means that answers should be taken directly from sectionContent.

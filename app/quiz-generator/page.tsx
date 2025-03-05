@@ -316,13 +316,38 @@ export default function QuizGeneratorPage() {
 		reader.readAsText(file);
 	};
 
-	// Function to submit the quiz to OpenAI API
+	// **Handles Image Generation for Each Section (Staggered Requests)**
+	const generateImagesForSections = () => {
+		quiz.courseSections.forEach((section, index) => {
+			setTimeout(() => {
+				fetch("/api/image-gen", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ userInput: section.sectionContent }),
+				})
+					.then((response) => {
+						if (!response.ok) throw new Error("Failed to generate image");
+						return response.json();
+					})
+					.then(({ imageUrl }) => {
+						if (imageUrl) {
+							localStorage.setItem(`quiz_section_${index}_image`, imageUrl);
+						}
+					})
+					.catch((error) => console.error(`Error generating image for section ${index}:`, error));
+			}, index * 500); // Stagger requests by 500ms per section
+		});
+	};
+
+	// **Handles Quiz Submission**
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true); // Show overlay and disable interactions
+
+		// Start generating images in parallel (won't block quiz submission)
+		generateImagesForSections();
+
 		try {
-			console.log('here', quiz.apiModel);
-			
 			const res = await fetch(`/api/${quiz.apiModel}`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
