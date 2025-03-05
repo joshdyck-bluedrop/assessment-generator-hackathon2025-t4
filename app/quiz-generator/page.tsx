@@ -274,7 +274,6 @@ export default function QuizGeneratorPage() {
 					>
 						<option value="openai">Open AI</option>
 						<option value="gemini">Gemini</option>
-						<option value="claude">Claude</option>
 					</select>
 				</div>
 			</div>
