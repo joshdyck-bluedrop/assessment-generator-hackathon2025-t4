@@ -295,14 +295,20 @@ export default function QuizGeneratorPage() {
 				{/* Quiz Audience */}
 				<label className="block text-gray-300 mt-2">
 					Target Audience Description
-					<input
+					<select
 						required
-						type="text"
-						placeholder="Target Audience"
 						value={quiz.quizAudience}
 						onChange={(e) => handleInputChange("quizAudience", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full"
-					/>
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+					>
+						<option value="" disabled>Select an audience</option>
+						<option value="Toddler">Toddler</option>
+						<option value="Aussie Bloke">Aussie Bloke</option>
+						<option value="Newfoundlander Bayman">Newfoundlander Bayman</option>
+						<option value="Surfer Dude">Surfer Dude</option>
+						<option value="French Aristocrat">French Aristocrat</option>
+						<option value="Astro-Physicist">Astro-Physicist</option>
+					</select>
 				</label>
 
 				{/* Quiz Difficulty */}
