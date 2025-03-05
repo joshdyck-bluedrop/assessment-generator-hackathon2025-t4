@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
+import {playTextToSpeech} from "../utils";
 
 interface CourseSection {
 	sectionTitle: string;
@@ -194,8 +195,6 @@ export default function QuizGeneratorPage() {
 		}));
 	};
 
-	const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-
 	// Start playing a witty complaint if loading takes longer than 5 seconds
 	useEffect(() => {
 		if (!isSubmitting) return;
@@ -236,22 +235,7 @@ export default function QuizGeneratorPage() {
 			const randomPhrase =
 				wittyLoadingPhrases[Math.floor(Math.random() * wittyLoadingPhrases.length)];
 
-			try {
-				const res = await fetch("/api/complaint-generator", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ text: randomPhrase }),
-				});
-
-				if (!res.ok) throw new Error("Failed to fetch audio");
-
-				const audioUrl = URL.createObjectURL(await res.blob());
-				const newAudio = new Audio(audioUrl);
-				setAudio(newAudio);
-				newAudio.play();
-			} catch (error) {
-				console.error("TTS Error:", error);
-			}
+			playTextToSpeech(randomPhrase, true);
 		}, randomNumber); // randomized delay before complaint fires
 
 		return () => clearTimeout(timeout);
@@ -362,12 +346,6 @@ export default function QuizGeneratorPage() {
 			router.push("/quiz");
 		} finally {
 			setIsSubmitting(false); // Hide overlay after request completion
-
-			// Stop any playing TTS audio when submission completes
-			if (audio) {
-				audio.pause();
-				audio.currentTime = 0;
-			}			
 		}
 	};
 
