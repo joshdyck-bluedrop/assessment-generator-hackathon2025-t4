@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const { text } = await req.json();
+        const { text, voice = "coral" } = await req.json(); // ✅ Use provided voice or default to "coral"
 
         const response = await fetch("https://api.openai.com/v1/audio/speech", {
             method: "POST",
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
                 model: "tts-1", // Adjust based on available models
-                voice: "coral", // Change voice model if needed
+                voice: voice, // ✅ Pass dynamic voice
                 input: text,
             }),
         });
