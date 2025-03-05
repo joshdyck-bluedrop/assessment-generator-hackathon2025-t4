@@ -23,6 +23,7 @@ export default function QuizGeneratorPage() {
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState("Generating your quiz...");
+	const [isGenerating, setIsGenerating] = useState(false);
 
 	// List of rotating loading messages
 	const loadingPhrases = [
@@ -289,6 +290,8 @@ export default function QuizGeneratorPage() {
 							sectionContent,
 						};
 					}).filter(Boolean) as CourseSection[];
+					
+					localStorage.setItem("quizAudience", quizAudience as string);
 
 					// Update state
 					setQuiz({
@@ -354,11 +357,53 @@ export default function QuizGeneratorPage() {
 			setIsSubmitting(false); // Hide overlay after request completion
 		}
 	};
+	
+		// 🧠 **Fetch AI-Generated Quiz Content (Fill the form, but don't submit)**
+		const generateQuizContent = async () => {
+			setIsGenerating(true);
+			try {
+				const response = await fetch("/api/generate-quiz-content", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(quiz), // Send existing quiz details
+				});
+
+				if (!response.ok) throw new Error("Failed to generate quiz content");
+
+				const jsonresponse = await response.json();
+
+				const parsedData = JSON.parse(jsonresponse);
+
+				localStorage.setItem("quizAudience", parsedData.quizAudience as string);
+
+				// 📝 Fill in the form with AI-generated content
+				setQuiz((prev) => ({
+					...prev,
+					quizTitle: parsedData.quizTitle || prev.quizTitle,
+					quizAudience: parsedData.quizAudience || prev.quizAudience,
+					courseSections: parsedData.courseSections || prev.courseSections,
+				}));
+			} catch (error) {
+				console.error("Error generating quiz:", error);
+			} finally {
+				setIsGenerating(false);
+			}
+		};
+		
 
 	return (
 		<form onSubmit={handleSubmit} className="p-6 max-w-2xl mx-auto relative">
 			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
 			<br />
+
+			<button 
+				type="button"
+				className="mt-4 bg-blue-500 mb-10 text-white px-4 py-2 rounded hover:bg-blue-600 w-full text-2xl"
+				disabled={isGenerating}
+				onClick={generateQuizContent}
+			>
+				{isGenerating ? "Generating Quiz Content..." : "🧠 Use AI to Generate Quiz Content"}
+			</button>
 
 			{/* CSV Upload with Floating Example */}
 			<div className="relative group inline-block">
@@ -567,7 +612,7 @@ export default function QuizGeneratorPage() {
 			</button>
 
 			{/* Overlay with Spinner and Text (Shown During Submission) */}
-			{isSubmitting && (
+			{(isSubmitting || isGenerating) && (
 				<div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75 z-50">
 					<div className="border-4 border-gray-200 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
 					<p className="mt-4 text-white text-lg font-semibold">{loadingMessage}</p>
