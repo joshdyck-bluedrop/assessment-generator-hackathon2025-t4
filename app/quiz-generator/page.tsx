@@ -275,25 +275,40 @@ export default function QuizGeneratorPage() {
 				complete: (results: any) => {
 					const data: string[][] = results.data as string[][];
 
-					// Check if any row has more than 2 columns
-					const invalidRow = data.find((row) => row.length > 2);
-					if (invalidRow) {
-						alert("Incorrect CSV format: Each row should have only two columns (Section Name and Section Content).");
+					if (data.length < 5) {
+						alert("Invalid CSV format: The first five rows must contain quiz metadata.");
 						return;
 					}
 
-					// Format sections
-					const parsedSections = data.map(([sectionTitle, sectionContent]) => ({
-						sectionTitle,
-						numberOfQuestionsInSection: 5, // Default to 5 questions per section
-						sectionContent,
-					}));
+					const quizTitle = data[0][0] || "";
+					const quizAudience = data[1][0] || "";
+					const quizDifficulty = data[2][0] || "";
+					const multipleOrSingleAnswers = data[3][0] || "";
+					const apiModel = data[4][0] || "openai";
+
+					// Parse sections (starting from the 6th row)
+					const parsedSections = data.slice(5).map(([sectionTitle, sectionContent, questionCount]) => {
+						if (isNaN(Number(questionCount))) {
+							alert(`Invalid number of questions: "${questionCount}" is not a number.`);
+							return null;
+						}
+
+						return {
+							sectionTitle,
+							numberOfQuestionsInSection: Number(questionCount),
+							sectionContent,
+						};
+					}).filter(Boolean) as CourseSection[];
 
 					// Update state
-					setQuiz((prev) => ({
-						...prev,
+					setQuiz({
+						quizTitle,
+						quizAudience,
+						quizDifficulty,
+						multipleOrSingleAnswers,
+						apiModel,
 						courseSections: parsedSections,
-					}));
+					});
 				},
 			});
 		};
@@ -349,27 +364,46 @@ export default function QuizGeneratorPage() {
 				</label>
 
 				{/* Floating Dialog with Example CSV & Dark Drop Shadow */}
-				<div className="absolute left-0 top-full mt-2 w-[400px] bg-gray-900 text-white border border-white rounded-lg shadow-lg shadow-black p-4 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 z-50">
+				<div className="absolute left-0 top-full mt-2 w-[600px] bg-gray-900 text-white border border-white rounded-lg shadow-lg shadow-black p-4 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 z-50">
 					<h2 className="text-xl font-semibold mb-2">Expected CSV Format:</h2>
 					<table className="w-full border border-gray-600 text-left">
 						<thead>
 							<tr className="bg-gray-800">
-								<th className="border border-gray-600 p-2">Section Name</th>
-								<th className="border border-gray-600 p-2">Section Content</th>
+								<th className="border border-gray-600 p-2">Row</th>
+								<th className="border border-gray-600 p-2">Purpose</th>
+								<th className="border border-gray-600 p-2">Example</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr className="bg-gray-900">
-								<td className="border border-gray-600 p-2">Alien Invasion Tactics</td>
-								<td className="border border-gray-600 p-2">How to diplomatically negotiate with extraterrestrials.</td>
+								<td className="border border-gray-600 p-2">1</td>
+								<td className="border border-gray-600 p-2">Quiz Title</td>
+								<td className="border border-gray-600 p-2">"The Ultimate Trivia Challenge"</td>
 							</tr>
 							<tr className="bg-gray-800">
-								<td className="border border-gray-600 p-2">Mastering the Art of Napping</td>
-								<td className="border border-gray-600 p-2">Techniques to sleep anywhere, anytime.</td>
+								<td className="border border-gray-600 p-2">2</td>
+								<td className="border border-gray-600 p-2">Target Audience</td>
+								<td className="border border-gray-600 p-2">"Aussie Bloke"</td>
 							</tr>
 							<tr className="bg-gray-900">
-								<td className="border border-gray-600 p-2">How to Outsmart a Goldfish</td>
-								<td className="border border-gray-600 p-2">A deep dive into memory training for fish lovers.</td>
+								<td className="border border-gray-600 p-2">3</td>
+								<td className="border border-gray-600 p-2">Quiz Difficulty</td>
+								<td className="border border-gray-600 p-2">"Challenging"</td>
+							</tr>
+							<tr className="bg-gray-800">
+								<td className="border border-gray-600 p-2">4</td>
+								<td className="border border-gray-600 p-2">Number of Answers</td>
+								<td className="border border-gray-600 p-2">"Single"</td>
+							</tr>
+							<tr className="bg-gray-900">
+								<td className="border border-gray-600 p-2">5</td>
+								<td className="border border-gray-600 p-2">AI Model</td>
+								<td className="border border-gray-600 p-2">"openai"</td>
+							</tr>
+							<tr className="bg-gray-800">
+								<td className="border border-gray-600 p-2">6+</td>
+								<td className="border border-gray-600 p-2">Quiz Section Titles Go in This Column</td>
+								<td className="border border-gray-600 p-2">"Space Exploration, How astronauts train, 5"</td>
 							</tr>
 						</tbody>
 					</table>
