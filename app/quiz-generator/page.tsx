@@ -270,6 +270,7 @@ export default function QuizGeneratorPage() {
 					<select
 						value={quiz.apiModel}
 						onChange={(e) => handleInputChange("apiModel", e.target.value)}
+						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
 					>
 						<option value="openai">Open AI</option>
 						<option value="gemini">Gemini</option>
