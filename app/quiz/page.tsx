@@ -51,6 +51,7 @@ export default function QuizPage() {
 	const [encouragementInterval, setEncouragementInterval] = useState<NodeJS.Timeout | null>(null);
 	const [sectionImages, setSectionImages] = useState<string[]>([]);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [imageLoaded, setImageLoaded] = useState(false); // Prevents content from showing before images load
 
     // 🎙️ List of encouragement phrases
     const encouragementPhrases = [
@@ -75,6 +76,15 @@ export default function QuizPage() {
 		"I'm speechless, high five to you!",
 		"You're a genius!",
 	];
+
+	// Wait until the first image is fully loaded before showing content
+	useEffect(() => {
+		if (sectionImages.length > 0) {
+			const img = new Image();
+			img.src = sectionImages[0];
+			img.onload = () => setImageLoaded(true);
+		}
+	}, [sectionImages]);
 
 	// 🎉 Load images for each section from localStorage
 	useEffect(() => {
@@ -234,7 +244,7 @@ export default function QuizPage() {
 		URL.revokeObjectURL(url);
 	};
 
-	if (!quizData || !quizData.courseSections) {
+	if (!quizData || !quizData.courseSections || !imageLoaded) {
 		return (
 			<div className="flex items-center justify-center h-screen w-full">
 				<p className="text-white text-xl pulse-opacity">Loading...</p>
