@@ -53,19 +53,19 @@ export default function QuizPage() {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [imageLoaded, setImageLoaded] = useState(false); // Prevents content from showing before images load
 
-    // 🎙️ List of encouragement phrases
-    const encouragementPhrases = [
-        "You're doing great! Keep it up!",
-        "Stay focused, you're almost there!",
-        "You got this! Let's rock this puppy!",
-        "You're a quiz master in the making!",
-        "Keep pushing! Every question counts!",
-        "Nice work! Let's keep going!",
-        "You're crushing it! Don't stop now!",
-        "Great job! Keep up the momentum!",
-        "You're unstoppable! Keep going strong!",
-        "Amazing effort! You're on fire!"
-    ];
+	// 🎙️ List of encouragement phrases
+	const encouragementPhrases = [
+		"You're doing great! Keep it up!",
+		"Stay focused, you're almost there!",
+		"You got this! Let's rock this puppy!",
+		"You're a quiz master in the making!",
+		"Keep pushing! Every question counts!",
+		"Nice work! Let's keep going!",
+		"You're crushing it! Don't stop now!",
+		"Great job! Keep up the momentum!",
+		"You're unstoppable! Keep going strong!",
+		"Amazing effort! You're on fire!"
+	];
 
 	const finalAffirmations = [
 		"You are awesome!",
@@ -97,16 +97,30 @@ export default function QuizPage() {
 		}
 	}, [quizData]);
 
-		// 🔄 Cycle through images every 3 seconds
-		useEffect(() => {
-			if (sectionImages.length < 2) return; // No need to cycle if only one image
-	
-			const interval = setInterval(() => {
-				setCurrentImageIndex((prevIndex) => (prevIndex + 1) % sectionImages.length);
-			}, 3000); // 3 seconds per image
-	
-			return () => clearInterval(interval);
-		}, [sectionImages]);
+	// 🔄 Cycle through images every 3 seconds
+	useEffect(() => {
+		if (sectionImages.length < 2) return; // No need to cycle if only one image
+
+		const interval = setInterval(() => {
+			setCurrentImageIndex((prevIndex) => (prevIndex + 1) % sectionImages.length);
+		}, 3000); // 3 seconds per image
+
+		return () => clearInterval(interval);
+	}, [sectionImages]);
+
+	const answerSelectionPhrases = [
+		"Good choice!",
+		"Interesting selection!",
+		"Let's see how that works out!",
+		"Hmm, that's an answer!",
+		"Bold move!",
+		"I see what you're thinking!",
+		"Let's go with that one!",
+		"That's one way to look at it!",
+		"Nice pick!",
+		"Let's lock that in!",
+		"Are you sure about that?",
+	];
 
 	// Play a random encouragement phrase every 10-20 seconds while the quiz is ongoing
 	useEffect(() => {
@@ -131,12 +145,18 @@ export default function QuizPage() {
 	}, [submitted]);
 
 	// Function to fetch and play TTS from the API
-	const playTextToSpeech = async (text: string) => {
+	const availableVoices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer", "ash"]; // 🎙️ Available voices for random selection
+
+	const playTextToSpeech = async (text: string, randomizeVoice = false) => {
 		try {
+			const selectedVoice = randomizeVoice
+				? availableVoices[Math.floor(Math.random() * availableVoices.length)] // ✅ Pick a random voice if required
+				: "coral"; // Default voice for non-randomized speech
+
 			const response = await fetch("/api/tts", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text }),
+				body: JSON.stringify({ text, voice: selectedVoice }), // ✅ Send selected voice
 			});
 
 			if (!response.ok) throw new Error("TTS API failed");
@@ -159,23 +179,45 @@ export default function QuizPage() {
 	}, []);
 
 	// Handle answer selection
+	const [lastSpokenTrigger, setLastSpokenTrigger] = useState<number>(0); // Used to trigger TTS without duplicates
+
 	const handleAnswerChange = (questionTitle: string, answerText: string, isMultiSelect: boolean) => {
 		if (submitted) return; // Prevent changes after submission
 
 		setUserAnswers((prev) => {
 			const currentAnswers = prev[questionTitle] || [];
+			let newAnswers = [];
+
 			if (isMultiSelect) {
 				// Toggle multi-select answer
-				const newAnswers = currentAnswers.includes(answerText)
+				newAnswers = currentAnswers.includes(answerText)
 					? currentAnswers.filter((a) => a !== answerText)
 					: [...currentAnswers, answerText];
-				return { ...prev, [questionTitle]: newAnswers };
 			} else {
 				// Single select (radio buttons)
-				return { ...prev, [questionTitle]: [answerText] };
+				newAnswers = [answerText];
 			}
+			return { ...prev, [questionTitle]: newAnswers };
 		});
+		// Increment trigger to activate useEffect
+		setLastSpokenTrigger((prev) => prev + 1);
 	};
+
+	// 🔊 Play random phrases
+	useEffect(() => {
+		if (lastSpokenTrigger === 0) return;
+
+		const getRandomPhrase = () => {
+			if (submitted) {
+				return finalAffirmations[Math.floor(Math.random() * finalAffirmations.length)];
+			} else {
+				return answerSelectionPhrases[Math.floor(Math.random() * answerSelectionPhrases.length)];
+			}
+		};
+
+		const randomPhrase = getRandomPhrase();
+		playTextToSpeech(randomPhrase);
+	}, [lastSpokenTrigger]); // Runs every time a new answer is selected
 
 	// Submit answers and calculate results
 	const handleSubmit = () => {
@@ -211,7 +253,7 @@ export default function QuizPage() {
 		// 🎉 Show confetti if score is 100%
 		if (calculatedScore === 100) {
 			setShowConfetti(true);
-			
+
 			// Trigger confetti animation
 			launchConfetti();
 
@@ -257,7 +299,6 @@ export default function QuizPage() {
 			{/* 🎉 Confetti Animation Overlay */}
 			{showConfetti && <div className="confetti-container"></div>}
 
-
 			<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 
 			{/* Quiz Content */}
@@ -294,15 +335,15 @@ export default function QuizPage() {
 												{submitted && isIncorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CancelIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"></path></svg>}
 												{submitted && isCorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CheckCircleIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"></path></svg>}
 												{!submitted && (
-														<input
-															type={isMultiSelect ? "checkbox" : "radio"}
-															name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : `question-${secIndex}-${qIndex}`}
-															value={answer.answerText}
-															checked={isSelected}
-															onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
-															disabled={submitted} // Disable after submission
-															className="mr-2"
-														/>
+													<input
+														type={isMultiSelect ? "checkbox" : "radio"}
+														name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : `question-${secIndex}-${qIndex}`}
+														value={answer.answerText}
+														checked={isSelected}
+														onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
+														disabled={submitted} // Disable after submission
+														className="mr-2"
+													/>
 												)}
 												{answer.answerText} {submitted && isSelected && '(Your Answer)'}
 											</label>
