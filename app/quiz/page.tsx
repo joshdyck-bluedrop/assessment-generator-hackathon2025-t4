@@ -89,7 +89,7 @@ export default function QuizPage() {
 		// Random interval between 10 and 20 seconds
 		const interval = setInterval(() => {
 			playEncouragement();
-		}, Math.floor(Math.random() * (20000 - 10000) + 10000));
+		}, Math.floor(Math.random() * (60000 - 20000) + 10000));
 
 		setEncouragementInterval(interval);
 
