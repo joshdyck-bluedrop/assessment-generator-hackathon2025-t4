@@ -141,6 +141,31 @@ export default function QuizGeneratorPage() {
 		}));
 	};
 
+	const handleSectionBlur = (index: number, content: string) => {
+		// Ensure sectionContent is not empty before sending request
+		if (!content.trim()) return;
+	
+		// Store section content in state
+		handleSectionChange(index, "sectionContent", content);
+	
+		fetch("/api/image-gen", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ userInput: content }),
+		})
+			.then((response) => {
+				if (!response.ok) throw new Error("Failed to generate image");
+				return response.json();
+			})
+			.then(({ imageUrl }) => {
+				if (imageUrl) {
+					// Save the image URL in localStorage for persistence
+					localStorage.setItem(`quiz_section_${index}_image`, imageUrl);
+				}
+			})
+			.catch((error) => console.error("Error generating image:", error));
+	};
+
 	// Function to handle section input changes
 	const handleSectionChange = (index: number, field: keyof CourseSection, value: string | number) => {
 		const updatedSections: any = [...quiz.courseSections];
@@ -380,6 +405,7 @@ export default function QuizGeneratorPage() {
 								placeholder="Section Content"
 								value={section.sectionContent}
 								onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
+								onBlur={(e) => handleSectionBlur(index, e.target.value)}
 								className="block mt-1 p-2 border border-gray-500 rounded w-full h-24 bg-gray-800 text-white"
 							/>
 						</label>

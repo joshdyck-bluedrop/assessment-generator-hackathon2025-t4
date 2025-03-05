@@ -49,12 +49,14 @@ export default function QuizPage() {
 	const [results, setResults] = useState<any | null>(null);
 	const [showConfetti, setShowConfetti] = useState(false);
 	const [encouragementInterval, setEncouragementInterval] = useState<NodeJS.Timeout | null>(null);
+	const [sectionImages, setSectionImages] = useState<string[]>([]);
+	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // 🎙️ List of encouragement phrases
     const encouragementPhrases = [
         "You're doing great! Keep it up!",
         "Stay focused, you're almost there!",
-        "You got this! Believe in yourself!",
+        "You got this! Let's rock this puppy!",
         "You're a quiz master in the making!",
         "Keep pushing! Every question counts!",
         "Nice work! Let's keep going!",
@@ -73,6 +75,28 @@ export default function QuizPage() {
 		"I'm speechless, high five to you!",
 		"You're a genius!",
 	];
+
+	// 🎉 Load images for each section from localStorage
+	useEffect(() => {
+		const loadedImages = quizData?.courseSections?.map((_: any, index: any) =>
+			localStorage.getItem(`quiz_section_${index}_image`)
+		).filter(Boolean); // Remove null values
+
+		if (loadedImages?.length > 0) {
+			setSectionImages(loadedImages);
+		}
+	}, [quizData]);
+
+		// 🔄 Cycle through images every 3 seconds
+		useEffect(() => {
+			if (sectionImages.length < 2) return; // No need to cycle if only one image
+	
+			const interval = setInterval(() => {
+				setCurrentImageIndex((prevIndex) => (prevIndex + 1) % sectionImages.length);
+			}, 3000); // 3 seconds per image
+	
+			return () => clearInterval(interval);
+		}, [sectionImages]);
 
 	// Play a random encouragement phrase every 10-20 seconds while the quiz is ongoing
 	useEffect(() => {
@@ -219,7 +243,7 @@ export default function QuizPage() {
 	}
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto text-white relative">
+		<div className="p-6 max-w-2xl mx-auto text-white relative z-10">
 			{/* 🎉 Confetti Animation Overlay */}
 			{showConfetti && <div className="confetti-container"></div>}
 
@@ -310,6 +334,27 @@ export default function QuizPage() {
 					<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full">
 						🔄 Generate New Quiz
 					</button>
+				</div>
+			)}
+
+			{/* 📸 Background Slideshow (Moved Below the Content) */}
+			{sectionImages.length > 0 && (
+				<div className="fixed inset-0 -z-10">
+					{/* 📸 Full-Screen Background Slideshow */}
+					{sectionImages.map((image, index) => (
+						<img
+							key={index}
+							src={image}
+							alt="Background"
+							className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+								index === currentImageIndex ? "opacity-100" : "opacity-0"
+							}`}
+						/>
+					))}
+
+					{/* 🔥 Full-Screen Dark Overlay */}
+					<div className="absolute inset-0 bg-black/85"></div> {/* Ensures true opacity */}
+					<div className="absolute inset-0 backdrop-blur-md"></div> {/* Applies blur separately */}
 				</div>
 			)}
 		</div>
