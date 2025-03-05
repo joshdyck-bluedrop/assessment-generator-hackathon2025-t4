@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
                         content: `Rewrite the following text to sound like it is spoken by a ${audience}: "${text}"`,
                     }
                 ],
-                temperature: 0.7,
+                temperature: 1.2,
             }),
         });
 
