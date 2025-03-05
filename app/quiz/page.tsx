@@ -132,7 +132,8 @@ export default function QuizPage() {
 
 		const playEncouragement = () => {
 			const randomPhrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
-			playTextToSpeech(randomPhrase, true);
+			const audience = localStorage.getItem("quizAudience") || "default";
+			playTextToSpeech(randomPhrase, true, audience);
 		};
 
 		// Random interval between 10 and 20 seconds
@@ -191,7 +192,8 @@ export default function QuizPage() {
 		};
 
 		const randomPhrase = getRandomPhrase();
-		playTextToSpeech(randomPhrase, true);
+		const audience = localStorage.getItem("quizAudience") || "default";
+		playTextToSpeech(randomPhrase, true, audience);
 	}, [lastSpokenTrigger]); // Runs every time a new answer is selected
 
 	// Submit answers and calculate results
@@ -237,7 +239,8 @@ export default function QuizPage() {
 
 		// 🗣 Play final affirmation
 		const finalPhrase = finalAffirmations[Math.floor(Math.random() * finalAffirmations.length)];
-		playTextToSpeech(finalPhrase, true);
+		const audience = localStorage.getItem("quizAudience") || "default";
+		playTextToSpeech(finalPhrase, true, audience);
 	};
 
 	// ✅ Function to Download JSON Results

@@ -141,6 +141,11 @@ export default function QuizGeneratorPage() {
 			...prev,
 			[field]: value,
 		}));
+
+		// Save quizAudience to localStorage when it changes
+		if (field === "quizAudience") {
+			localStorage.setItem("quizAudience", value as string);
+		}
 	};
 
 	const handleSectionBlur = (index: number, content: string) => {
@@ -235,7 +240,8 @@ export default function QuizGeneratorPage() {
 			const randomPhrase =
 				wittyLoadingPhrases[Math.floor(Math.random() * wittyLoadingPhrases.length)];
 
-			playTextToSpeech(randomPhrase, true);
+			const audience = localStorage.getItem("quizAudience") || "default";
+			playTextToSpeech(randomPhrase, true, audience);
 		}, randomNumber); // randomized delay before complaint fires
 
 		return () => clearTimeout(timeout);
@@ -461,7 +467,6 @@ export default function QuizGeneratorPage() {
 						<option value="Astro-Physicist">Astro-Physicist</option>
 					</select>
 				</label>
-
 				{/* Quiz Difficulty */}
 				<label className="block text-gray-300 mt-2">
 					Quiz Difficulty
