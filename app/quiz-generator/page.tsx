@@ -405,232 +405,244 @@ export default function QuizGeneratorPage() {
 		
 
 	return (
-		<form onSubmit={handleSubmit} className="p-6 max-w-2xl mx-auto relative">
-			<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
-			<br />
+		<div className="min-h-screen flex flex-col bg-gray-950 text-white">
 
-			<button 
-				type="button"
-				className="mt-4 bg-blue-500 mb-10 text-white px-4 py-2 rounded hover:bg-blue-600 w-full text-2xl"
-				disabled={isGenerating}
-				onClick={generateQuizContent}
-			>
-				{isGenerating ? "Generating Quiz Content..." : "🧠 Use AI to Generate Quiz Content"}
-			</button>
+			{/* 🏁 Top Navigation Bar */}
+			<header className="w-full bg-gray-900 shadow-lg py-4 px-6 flex items-center">
+				<img src="/flag.png" alt="Checkered Flag" className="h-8 w-8 mr-3" />
+				<h1 className="text-2xl font-bold">Fast Track Assessments</h1>
+			</header>
 
-			{/* CSV Upload with Floating Example */}
-			<div className="relative group inline-block">
-				<label className="block mb-4">
-					<span className="text-white font-semibold">Upload CSV:</span>
-					<input
-						type="file"
-						accept=".csv"
-						onChange={handleCSVUpload}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-					/>
-				</label>
+			<form onSubmit={handleSubmit} className="p-6 max-w-2xl mx-auto relative">
+				<h1 className="text-2xl font-bold">Generate a New Quiz</h1>
+				<br />
 
-				{/* Floating Dialog with Example CSV & Dark Drop Shadow */}
-				<div className="absolute left-0 top-full mt-2 w-[600px] bg-gray-900 text-white border border-white rounded-lg shadow-lg shadow-black p-4 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 z-50">
-					<h2 className="text-xl font-semibold mb-2">Expected CSV Format:</h2>
-					<table className="w-full border border-gray-600 text-left">
-						<thead>
-							<tr className="bg-gray-800">
-								<th className="border border-gray-600 p-2">Row</th>
-								<th className="border border-gray-600 p-2">Purpose</th>
-								<th className="border border-gray-600 p-2">Example</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr className="bg-gray-900">
-								<td className="border border-gray-600 p-2">1</td>
-								<td className="border border-gray-600 p-2">Quiz Title</td>
-								<td className="border border-gray-600 p-2">"The Ultimate Trivia Challenge"</td>
-							</tr>
-							<tr className="bg-gray-800">
-								<td className="border border-gray-600 p-2">2</td>
-								<td className="border border-gray-600 p-2">Target Audience</td>
-								<td className="border border-gray-600 p-2">"Aussie Bloke"</td>
-							</tr>
-							<tr className="bg-gray-900">
-								<td className="border border-gray-600 p-2">3</td>
-								<td className="border border-gray-600 p-2">Quiz Difficulty</td>
-								<td className="border border-gray-600 p-2">"Challenging"</td>
-							</tr>
-							<tr className="bg-gray-800">
-								<td className="border border-gray-600 p-2">4</td>
-								<td className="border border-gray-600 p-2">Number of Answers</td>
-								<td className="border border-gray-600 p-2">"Single"</td>
-							</tr>
-							<tr className="bg-gray-900">
-								<td className="border border-gray-600 p-2">5</td>
-								<td className="border border-gray-600 p-2">AI Model</td>
-								<td className="border border-gray-600 p-2">"openai"</td>
-							</tr>
-							<tr className="bg-gray-800">
-								<td className="border border-gray-600 p-2">6+</td>
-								<td className="border border-gray-600 p-2">Quiz Section Titles Go in This Column</td>
-								<td className="border border-gray-600 p-2">"Space Exploration, How astronauts train, 5"</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-
-			<div className="flex justify-between">
-				<h2 className="text-xl font-semibold">Quiz Options</h2>
-				<div className="flex items-center gap-2">
-					<p className="font-bold">Select&nbsp;AI:</p>
-					<select
-						value={quiz.apiModel}
-						onChange={(e) => handleInputChange("apiModel", e.target.value)}
-						className="block p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-					>
-						<option value="openai">Open AI</option>
-						<option value="gemini">Gemini</option>
-						<option value="claude">Claude</option>
-					</select>
-				</div>
-			</div>
-
-			<div className="bg-gray-900 p-4 border border-gray-500 rounded-lg mt-4">
-				{/* Quiz Title */}
-				<label className="block text-gray-300 mt-2">
-					Quiz Title
-					<input
-						required
-						type="text"
-						placeholder="Quiz Title"
-						value={quiz.quizTitle}
-						onChange={(e) => handleInputChange("quizTitle", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full"
-					/>
-				</label>
-
-				{/* Quiz Audience */}
-				<label className="block text-gray-300 mt-2">
-					Target Audience Description
-					<select
-						required
-						value={quiz.quizAudience}
-						onChange={(e) => handleInputChange("quizAudience", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-					>
-						<option value="" disabled>Select an audience</option>
-						<option value="Toddler">Toddler</option>
-						<option value="Aussie Bloke">Aussie Bloke</option>
-						<option value="Newfoundlander Bayman">Newfoundlander Bayman</option>
-						<option value="Surfer Dude">Surfer Dude</option>
-						<option value="French Aristocrat">French Aristocrat</option>
-						<option value="Astro-Physicist">Astro-Physicist</option>
-					</select>
-				</label>
-				{/* Quiz Difficulty */}
-				<label className="block text-gray-300 mt-2">
-					Quiz Difficulty
-					<select
-						value={quiz.quizDifficulty}
-						onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-						>
-						<option value="simple">Simple</option>
-						<option value="challenging">Challenging</option>
-						<option value="balanced mix of simple and challenging">Balanced Mix</option>
-					</select>
-				</label>
-
-				{/* Answer Type */}
-				<label className="block text-gray-300 mt-2">
-					Number of Answers
-					<select
-						value={quiz.multipleOrSingleAnswers}
-						onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
-						className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"					>
-						<option value="single">Single Answers Only</option>
-						<option value="multiple">Allow Multiple Answers</option>
-					</select>
-				</label>
-			</div>
-
-			{/* Sections */}
-			<div className="mt-4">
-				<h2 className="text-xl font-semibold">Sections</h2>
-				{quiz.courseSections.map((section, index) => (
-					<div key={index} className="mt-4 p-4 border border-gray-500 bg-gray-900 rounded-lg text-white">
-						<h3 className="text-lg font-medium">Section {index + 1}</h3>
-
-						{/* Section Title */}
-						<label className="block text-gray-300 mt-2">
-							Section Title
-							<input
-								required
-								type="text"
-								placeholder="Section Title"
-								value={section.sectionTitle}
-								onChange={(e) => handleSectionChange(index, "sectionTitle", e.target.value)}
-								className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-							/>
-						</label>
-
-						{/* Number of Questions */}
-						<label className="block text-gray-300 mt-2">
-							Number of Questions
-							<input
-								type="number"
-								min="1"
-								placeholder="Number of Questions"
-								value={section.numberOfQuestionsInSection}
-								onChange={(e) => handleSectionChange(index, "numberOfQuestionsInSection", Number(e.target.value))}
-								className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
-							/>
-						</label>
-
-						{/* Section Content */}
-						<label className="block text-gray-300 mt-2">
-							Section Content
-							<textarea
-								required
-								placeholder="Section Content"
-								value={section.sectionContent}
-								onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
-								onBlur={(e) => handleSectionBlur(index, e.target.value)}
-								className="block mt-1 p-2 border border-gray-500 rounded w-full h-24 bg-gray-800 text-white"
-							/>
-						</label>
-
-						{/* Remove Section Button (Only for Additional Sections) */}
-						{index > 0 && (
-							<button
-								onClick={() => removeSection(index)}
-								className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-							>
-								Remove Section
-							</button>
-						)}
-					</div>
-				))}
-
-				{/* Add New Section Button */}
-				<button onClick={addNewSection} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-					＋ Add Section
+				<button 
+					type="button"
+					className="mt-4 bg-blue-500 mb-10 text-white px-4 py-2 rounded hover:bg-blue-600 w-full text-2xl"
+					disabled={isGenerating}
+					onClick={generateQuizContent}
+				>
+					{isGenerating ? "Generating Quiz Content..." : "✨ Use AI to Generate Quiz Content"}
 				</button>
-			</div>
 
-			<br />
-			<br />
+				{/* CSV Upload with Floating Example */}
+				<div className="relative group inline-block">
+					<label className="block mb-4">
+						<span className="text-white font-semibold">Upload CSV:</span>
+						<input
+							type="file"
+							accept=".csv"
+							onChange={handleCSVUpload}
+							className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						/>
+					</label>
 
-			{/* Generate Quiz Button */}
-			<button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
-				Generate Quiz
-			</button>
-
-			{/* Overlay with Spinner and Text (Shown During Submission) */}
-			{(isSubmitting || isGenerating) && (
-				<div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75 z-50">
-					<div className="border-4 border-gray-200 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
-					<p className="mt-4 text-white text-lg font-semibold">{loadingMessage}</p>
+					{/* Floating Dialog with Example CSV & Dark Drop Shadow */}
+					<div className="absolute left-0 top-full mt-2 w-[600px] bg-gray-900 text-white border border-white rounded-lg shadow-lg shadow-black p-4 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 z-50">
+						<h2 className="text-xl font-semibold mb-2">Expected CSV Format:</h2>
+						<table className="w-full border border-gray-600 text-left">
+							<thead>
+								<tr className="bg-gray-800">
+									<th className="border border-gray-600 p-2">Row</th>
+									<th className="border border-gray-600 p-2">Purpose</th>
+									<th className="border border-gray-600 p-2">Example</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr className="bg-gray-900">
+									<td className="border border-gray-600 p-2">1</td>
+									<td className="border border-gray-600 p-2">Quiz Title</td>
+									<td className="border border-gray-600 p-2">"The Ultimate Trivia Challenge"</td>
+								</tr>
+								<tr className="bg-gray-800">
+									<td className="border border-gray-600 p-2">2</td>
+									<td className="border border-gray-600 p-2">Target Audience</td>
+									<td className="border border-gray-600 p-2">"Aussie Bloke"</td>
+								</tr>
+								<tr className="bg-gray-900">
+									<td className="border border-gray-600 p-2">3</td>
+									<td className="border border-gray-600 p-2">Quiz Difficulty</td>
+									<td className="border border-gray-600 p-2">"Challenging"</td>
+								</tr>
+								<tr className="bg-gray-800">
+									<td className="border border-gray-600 p-2">4</td>
+									<td className="border border-gray-600 p-2">Number of Answers</td>
+									<td className="border border-gray-600 p-2">"Single"</td>
+								</tr>
+								<tr className="bg-gray-900">
+									<td className="border border-gray-600 p-2">5</td>
+									<td className="border border-gray-600 p-2">AI Model</td>
+									<td className="border border-gray-600 p-2">"openai"</td>
+								</tr>
+								<tr className="bg-gray-800">
+									<td className="border border-gray-600 p-2">6+</td>
+									<td className="border border-gray-600 p-2">Quiz Section Titles Go in This Column</td>
+									<td className="border border-gray-600 p-2">"Space Exploration, How astronauts train, 5"</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
-			)}
-		</form>
+
+				<div className="flex justify-between">
+					<h2 className="text-xl font-semibold">Quiz Options</h2>
+					<div className="flex items-center gap-2">
+						<p className="font-bold">Select&nbsp;AI:</p>
+						<select
+							value={quiz.apiModel}
+							onChange={(e) => handleInputChange("apiModel", e.target.value)}
+							className="block p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						>
+							<option value="openai">Open AI</option>
+							<option value="gemini">Gemini</option>
+							<option value="claude">Claude</option>
+						</select>
+					</div>
+				</div>
+
+				<div className="bg-gray-900 p-4 border border-gray-500 rounded-lg mt-4">
+					{/* Quiz Title */}
+					<label className="block text-gray-300 mt-2">
+						Quiz Title
+						<input
+							required
+							type="text"
+							placeholder="Quiz Title"
+							value={quiz.quizTitle}
+							onChange={(e) => handleInputChange("quizTitle", e.target.value)}
+							className="block mt-2 p-2 border border-gray-500 rounded w-full"
+						/>
+					</label>
+
+					{/* Quiz Audience */}
+					<label className="block text-gray-300 mt-2">
+						Target Audience Description
+						<select
+							required
+							value={quiz.quizAudience}
+							onChange={(e) => handleInputChange("quizAudience", e.target.value)}
+							className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+						>
+							<option value="" disabled>Select an audience</option>
+							<option value="Toddler">Toddler</option>
+							<option value="Aussie Bloke">Aussie Bloke</option>
+							<option value="Newfoundlander Bayman">Newfoundlander Bayman</option>
+							<option value="Surfer Dude">Surfer Dude</option>
+							<option value="French Aristocrat">French Aristocrat</option>
+							<option value="Astro-Physicist">Astro-Physicist</option>
+						</select>
+					</label>
+					{/* Quiz Difficulty */}
+					<label className="block text-gray-300 mt-2">
+						Quiz Difficulty
+						<select
+							value={quiz.quizDifficulty}
+							onChange={(e) => handleInputChange("quizDifficulty", e.target.value)}
+							className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+							>
+							<option value="simple">Simple</option>
+							<option value="challenging">Challenging</option>
+							<option value="balanced mix of simple and challenging">Balanced Mix</option>
+						</select>
+					</label>
+
+					{/* Answer Type */}
+					<label className="block text-gray-300 mt-2">
+						Number of Answers
+						<select
+							value={quiz.multipleOrSingleAnswers}
+							onChange={(e) => handleInputChange("multipleOrSingleAnswers", e.target.value)}
+							className="block mt-2 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"					>
+							<option value="single">Single Answers Only</option>
+							<option value="multiple">Allow Multiple Answers</option>
+						</select>
+					</label>
+				</div>
+
+				{/* Sections */}
+				<div className="mt-4">
+					<h2 className="text-xl font-semibold">Sections</h2>
+					{quiz.courseSections.map((section, index) => (
+						<div key={index} className="mt-4 p-4 border border-gray-500 bg-gray-900 rounded-lg text-white">
+							<h3 className="text-lg font-medium">Section {index + 1}</h3>
+
+							{/* Section Title */}
+							<label className="block text-gray-300 mt-2">
+								Section Title
+								<input
+									required
+									type="text"
+									placeholder="Section Title"
+									value={section.sectionTitle}
+									onChange={(e) => handleSectionChange(index, "sectionTitle", e.target.value)}
+									className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+								/>
+							</label>
+
+							{/* Number of Questions */}
+							<label className="block text-gray-300 mt-2">
+								Number of Questions
+								<input
+									type="number"
+									min="1"
+									placeholder="Number of Questions"
+									value={section.numberOfQuestionsInSection}
+									onChange={(e) => handleSectionChange(index, "numberOfQuestionsInSection", Number(e.target.value))}
+									className="block mt-1 p-2 border border-gray-500 rounded w-full bg-gray-800 text-white"
+								/>
+							</label>
+
+							{/* Section Content */}
+							<label className="block text-gray-300 mt-2">
+								Section Content
+								<textarea
+									required
+									placeholder="Section Content"
+									value={section.sectionContent}
+									onChange={(e) => handleSectionChange(index, "sectionContent", e.target.value)}
+									onBlur={(e) => handleSectionBlur(index, e.target.value)}
+									className="block mt-1 p-2 border border-gray-500 rounded w-full h-24 bg-gray-800 text-white"
+								/>
+							</label>
+
+							{/* Remove Section Button (Only for Additional Sections) */}
+							{index > 0 && (
+								<button
+									onClick={() => removeSection(index)}
+									className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+								>
+									Remove Section
+								</button>
+							)}
+						</div>
+					))}
+
+					{/* Add New Section Button */}
+					<button onClick={addNewSection} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+						＋ Add Section
+					</button>
+				</div>
+
+				<br />
+				<br />
+
+				{/* Generate Quiz Button */}
+				<button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
+					Generate Quiz
+				</button>
+
+				{/* Overlay with Spinner and Text (Shown During Submission) */}
+				{(isSubmitting || isGenerating) && (
+					<div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75 z-50">
+						<div className="border-4 border-gray-200 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
+						<p className="mt-4 text-white text-lg font-semibold">{loadingMessage}</p>
+					</div>
+				)}
+			</form>
+			<footer className="w-full py-4 px-6 text-right text-gray-400 text-sm">
+				Powered by <span className="text-white font-semibold">JATT25 Pit Stop Legends</span>
+			</footer>
+		</div>
 	);
 }

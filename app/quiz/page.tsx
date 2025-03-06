@@ -297,6 +297,11 @@ export default function QuizPage() {
 
 	return (
 		<div className="p-6 max-w-2xl mx-auto text-white relative z-10">
+			{/* 🏁 Top Navigation Bar */}
+			<header className="w-full bg-gray-900 shadow-lg py-4 px-6 flex items-center">
+				<img src="/flag.png" alt="Checkered Flag" className="h-8 w-8 mr-3" />
+				<h1 className="text-2xl font-bold">Fast Track Assessments</h1>
+			</header>
 			{/* 🎉 Confetti Animation Overlay */}
 			{showConfetti && <div className="confetti-container"></div>}
 
@@ -412,6 +417,9 @@ export default function QuizPage() {
 					<div className="absolute inset-0 backdrop-blur-md"></div> {/* Applies blur separately */}
 				</div>
 			)}
+			<footer className="w-full py-4 px-6 text-right text-gray-400 text-sm">
+				Powered by <span className="text-white font-semibold">JATT25 Pit Stop Legends</span>
+			</footer>
 		</div>
 	);
 }
