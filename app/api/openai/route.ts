@@ -18,14 +18,14 @@
 //     ]
 //   }
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY!,
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
 	try {
 		const inputData = await req.json();
 		const { quizTitle, quizAudience, quizDifficulty, multipleOrSingleAnswers, courseSections } = inputData;
@@ -33,75 +33,83 @@ export async function POST(req: Request) {
 		if (!quizTitle || !quizAudience || !quizDifficulty || !multipleOrSingleAnswers || !courseSections) {
 			return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 		}
-
-        const prompt = `
-        You are an AI quiz generator. Your task is to generate quiz questions **strictly based on the provided section content**. Do not use any external knowledge or assumptions. 
-        
-        ### Input Details:
-        - **Title**: ${quizTitle}
-        - **Audience**: ${quizAudience}
-        - **Difficulty**: ${quizDifficulty}
-        - **Answer Type**: ${multipleOrSingleAnswers === "multiple" ? "Multiple-choice (1-4 correct answers)" : "Single correct answer"}
-        - **Sections Provided**: ${courseSections.length} sections
-        
-        ### Instructions:
-        1. **DO NOT** generate your own section titles. Use the exact sections provided.
-        2. **DO NOT** add or remove sections. Use exactly the number of sections provided.
-        3. **DO NOT** generate questions from external knowledge. Use only the content from each section.
-        4. **DO NOT** alter the number of questions per section. Each section must have exactly the requested number of questions.
-        5. **DO NOT** include any explanations or additional text in the output, ONLY VALID JSON.
-        6. **DO NOT** include markdown formatting (such as \`\`\`json).
-        7. **DO NOT** allow duplicate questions.
-        8. Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
-        9. Question difficulty of challenging from input details means that answers should be more abstract and inferred based on multiple facts from the sectionContent and not directly listed as a fact in sectionContent.
-        10. Question difficulty of simple from input details means that answers should be taken directly from sectionContent.
-        11. Question difficulty value of "balanced mix of simple and challenging" from input details means that answers should be an even mix of answers inferred from the sectionContent and answers taken directly from the sectionContent.
-        12: Randomly shuffle the correct answer(s) among the incorrect answers to ensure their positions are unpredictable.
-        13: Make sure the correct answer is not in the same order relative to the incorrect answer.
-        14. Incorrect answer options must be of similar complexity and sentence length to the correct answer to avoid easy detection by user.
-        15. If Answer Type from input details is **multiple answers**, include **1-4 correct answers** and ensure that at least one question has more than one answer.
-        16. If Answer Type from input details is **single answer**, ensure only **one correct answer**.
-        17. **Return the result as a valid JSON object** without any extra text, headers, or explanations.
-        18. **Remove any characters that represent invalid JSON**.
-        
-        ### Course Sections & Questions:
-        ${courseSections.map((section: any, index: any) => `
-        - **Section ${index + 1}: ${section.sectionTitle}**
-          - Content: "${section.sectionContent}"
-          - Number of Questions: ${section.numberOfQuestionsInSection}
-        `).join("\n")}
-        
-        ### **Expected JSON Output Format:**
-        {
-          "quizTitle": "${quizTitle}",
-          "courseSections": [
-            {
-              "sectionTitle": "EXACT section title from input",
-              "sectionQuestions": [
-                {
-                  "questionTitle": "Generated question based ONLY on the section content",
-                  "answers": [
-                    // object with "isCorrect": true must be in random order in array, and most often in a different position for each question
-                    { "isCorrect": boolean, "answerText": "'Correct Answer' if isCorrect is true OR 'Incorrect Answer' if isCorrect is false" },
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-        `;
+    const sanitizedSections = courseSections.map((section: any) => ({
+      sectionTitle: section.sectionTitle,
+      sectionContent: section.sectionContent.replace(/"/g, '\\"'), // Escape quotes
+      numberOfQuestionsInSection: section.numberOfQuestionsInSection,
+    }));
+    
+    const prompt = `
+    You are an AI quiz generator. Your task is to generate quiz questions **strictly based on the provided section content**. Do not use any external knowledge or assumptions.
+    
+    ### Input Details:
+    - **Title**: ${quizTitle}
+    - **Audience Style**: ${quizAudience} (Use their speech pattern and tone)
+    - **Difficulty**: ${quizDifficulty}
+    - **Answer Type**: ${multipleOrSingleAnswers === "multiple" ? "Multiple-choice (1-4 correct answers)" : "Single correct answer"}
+    - **Sections Provided**: ${courseSections.length} sections
+    
+    ### **Instructions**
+    1. **DO NOT** generate your own section titles. Use the exact sections provided.
+    2. **DO NOT** add or remove sections. Use exactly the number of sections provided.
+    3. **DO NOT** generate questions from external knowledge. Use only the content from each section.
+    4. **DO NOT** alter the number of questions per section. Each section must have exactly the requested number of questions.
+    5. **DO NOT** include explanations or additional text. **Return ONLY VALID JSON**.
+    6. **DO NOT** include markdown formatting (such as \`\`\`json).
+    7. **DO NOT** allow duplicate questions.
+    8. **THE AUDIENCE STYLE IS CRITICAL!** All questions should be **written in the dialect, tone, and vocabulary of the audience**. However, slang should **not break JSON structure or readability**.
+    9. **Ensure that all answers are strictly derived from the section content**.
+    10. **For "challenging" difficulty**, make answers inferential rather than explicitly stated.
+    11. **For "simple" difficulty**, use facts explicitly present in sectionContent.
+    12. **For "balanced mix" difficulty**, include both types of questions evenly.
+    13. **Randomly shuffle the correct answer(s) in the list** but **ensure correct JSON formatting**.
+    14. **Ensure incorrect answer options are of similar complexity to the correct answer**.
+    15. **Ensure "multiple answers" type includes at least one question with more than one correct answer**.
+    16. **Ensure "single answer" type only has one correct answer**.
+    17. **DO NOT insert excessive or unrealistic slang that breaks structure. Keep the speech pattern natural and readable.**
+    18. **Return ONLY a valid JSON object** with NO extra text, headers, or explanations.
+    19. **Ensure JSON format correctness. If invalid JSON is generated, retry and self-correct.**
+    
+    ### **Course Sections & Questions**
+    ${JSON.stringify(sanitizedSections, null, 2)}
+    
+    ### **Expected JSON Output Format:**
+    ${JSON.stringify(
+      {
+        quizTitle,
+        courseSections: sanitizedSections.map((section: any) => ({
+          sectionTitle: section.sectionTitle,
+          sectionQuestions: Array(section.numberOfQuestionsInSection)
+            .fill(null)
+            .map(() => ({
+              questionTitle: "Generated question based ONLY on the section content",
+              answers: [
+                { isCorrect: true, answerText: "Correct Answer" },
+                { isCorrect: false, answerText: "Incorrect Answer 1" },
+                { isCorrect: false, answerText: "Incorrect Answer 2" },
+                { isCorrect: false, answerText: "Incorrect Answer 3" },
+              ],
+            })),
+        })),
+      },
+      null,
+      2
+    )}
+    `;
 
 		const response = await openai.chat.completions.create({
 			model: "gpt-4-turbo",
 			messages: [{ role: "system", content: "You are an expert AI that generates high-quality quiz questions." }, { role: "user", content: prompt }],
 			temperature: 0.7,
-			max_tokens: 2000,
+			max_tokens: 4000,
 		});
 
 		const aiResponse = response.choices[0].message?.content?.trim();
 		if (!aiResponse) {
 			return NextResponse.json({ error: "No response from OpenAI" }, { status: 500 });
 		}
+
+    console.log(`\x1b[93maiResponse: ${aiResponse}\x1b[0m`);
 
 		// Try parsing response as JSON
 		try {
