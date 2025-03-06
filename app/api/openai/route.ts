@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         5. **DO NOT** include any explanations or additional text in the output, ONLY VALID JSON.
         6. **DO NOT** include markdown formatting (such as \`\`\`json).
         7. **DO NOT** allow duplicate questions.
-        8. Question vernacular and langiuage style should be in the dialect and speech pattern of the audience description provided in the input details.
+        8. Question vernacular and language style **MUST BE** be in the dialect and speech pattern of the audience description provided in the input details.
         9. Question difficulty of challenging from input details means that answers should be more abstract and inferred based on multiple facts from the sectionContent and not directly listed as a fact in sectionContent.
         10. Question difficulty of simple from input details means that answers should be taken directly from sectionContent.
         11. Question difficulty value of "balanced mix of simple and challenging" from input details means that answers should be an even mix of answers inferred from the sectionContent and answers taken directly from the sectionContent.
@@ -63,6 +63,7 @@ export async function POST(req: Request) {
         16. If Answer Type from input details is **single answer**, ensure only **one correct answer**.
         17. **Return the result as a valid JSON object** without any extra text, headers, or explanations.
         18. **Remove any characters that represent invalid JSON**.
+        19. **IMPORTANT** Questions and answers must be written in the language and style of the ${quizAudience} audience.
         
         ### Course Sections & Questions:
         ${courseSections.map((section: any, index: any) => `
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
 		const response = await openai.chat.completions.create({
 			model: "gpt-4-turbo",
 			messages: [{ role: "system", content: "You are an expert AI that generates high-quality quiz questions." }, { role: "user", content: prompt }],
-			temperature: 0.7,
+			temperature: 1.2,
 			max_tokens: 2000,
 		});
 
