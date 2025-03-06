@@ -406,7 +406,6 @@ export default function QuizGeneratorPage() {
 
 	return (
 		<div className="min-h-screen flex flex-col bg-gray-950 text-white">
-
 			{/* 🏁 Top Navigation Bar */}
 			<header className="w-full bg-gray-900 shadow-lg py-4 px-6 flex items-center">
 				<img src="/flag.png" alt="Checkered Flag" className="h-8 w-8 mr-3" />
