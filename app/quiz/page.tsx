@@ -131,9 +131,9 @@ export default function QuizPage() {
 		}
 
 		const playEncouragement = () => {
-			const randomPhrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
-			const audience = localStorage.getItem("quizAudience") || "default";
-			playTextToSpeech(randomPhrase, true, audience);
+			// const randomPhrase = encouragementPhrases[Math.floor(Math.random() * encouragementPhrases.length)];
+			// const audience = localStorage.getItem("quizAudience") || "default";
+			// // playTextToSpeech(randomPhrase, true, audience);
 		};
 
 		// Random interval between 10 and 20 seconds
