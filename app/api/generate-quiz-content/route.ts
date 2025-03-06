@@ -10,7 +10,7 @@ interface QuizRequestBody {
 
 export async function POST(req: NextRequest) {
 	try {
-		const { quizTitle, quizAudience, quizDifficulty, multipleOrSingleAnswers, apiModel }: QuizRequestBody =
+		const { apiModel }: QuizRequestBody =
 			await req.json();
 
 		// 🎲 Randomize Sections (2-4) & Questions per Section (3-6)
@@ -19,20 +19,20 @@ export async function POST(req: NextRequest) {
 
 		// 📝 AI Prompt (Force JSON Output)
 		const quizPrompt = `Generate a structured quiz with the following details:
-        - Title: ${quizTitle}
-        - Audience: ${quizAudience}
-        - Difficulty: ${quizDifficulty}
-        - Answer Type: ${multipleOrSingleAnswers} answers
+        - Title: Can be any topic
+        - Audience: Can be one of "Toddler", "Aussie Bloke", "French Aristocrat", "Newfoundlander Bayman", "Surfer Dude", or "Astro-Physicist"
+        - Difficulty: Can be one of "simple", "challenging" or "balanced mix of simple and challenging"
+        - Answer Type: Can be one of "single" or "multiple"
         - Format: ${numSections} sections with ${numQuestions} or ${numQuestions - 1} questions in each section.
         - Each section should have a title, a short section content description, and a specified number of questions.
         - **Return only valid JSON in the following structure:**
         
         {
-            "quizTitle": "${quizTitle}",
-            "quizAudience": "${quizAudience}",
-            "quizDifficulty": "${quizDifficulty}",
-            "multipleOrSingleAnswers": "${multipleOrSingleAnswers}",
-            "apiModel": "${apiModel}",
+            "quizTitle": string;
+            "quizAudience": "Toddler" | "Aussie Bloke" | "French Aristocrat" | "Newfoundlander Bayman" | "Surfer Dude" | "Astro-Physicist";
+            "quizDifficulty": simple" | "challenging" | "balanced mix of simple and challenging";
+            "multipleOrSingleAnswers": "single" | "multiple";
+            "apiModel": "claude" | "openai" | "gemini",
             "courseSections": [
                 // Use ${numSections} sections with ${numQuestions} or ${numQuestions - 1} numberOfQuestionsInSection. Each section can have different numbers of questions. Here is an example:
                 {
