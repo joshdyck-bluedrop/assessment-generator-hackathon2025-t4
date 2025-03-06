@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 		// 📝 AI Prompt (Force JSON Output)
 		const quizPrompt = `Generate a structured quiz with the following details:
         - Title: Can be any topic
-        - Audience: Can be one of "Toddler", "Aussie Bloke", "French Aristocrat", "Newfoundlander Bayman", "Surfer Dude", or "Astro-Physicist"
+        - Audience: Use randomly one of "Toddler", "Aussie Bloke", "French Aristocrat", "Surfer Dude", "Newfoundlander Bayman"
         - Difficulty: Can be one of "simple", "challenging" or "balanced mix of simple and challenging"
         - Answer Type: Can be one of "single" or "multiple"
         - Format: ${numSections} sections with ${numQuestions} or ${numQuestions - 1} questions in each section.
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         
         {
             "quizTitle": string;
-            "quizAudience": "Toddler" | "Aussie Bloke" | "French Aristocrat" | "Newfoundlander Bayman" | "Surfer Dude" | "Astro-Physicist";
+            "quizAudience": "Toddler" | "Aussie Bloke" | "French Aristocrat" | "Newfoundlander Bayman" | "Surfer Dude";
             "quizDifficulty": simple" | "challenging" | "balanced mix of simple and challenging";
             "multipleOrSingleAnswers": "single" | "multiple";
             "apiModel": "claude" | "openai" | "gemini",

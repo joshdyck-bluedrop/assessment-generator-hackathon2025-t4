@@ -1,51 +1,56 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
+// ✅ Initialize OpenAI with API key
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY!, // Ensure this is set in your environment variables
+	apiKey: process.env.OPENAI_API_KEY || "",
 });
 
-// Function to safely trim the prompt while preserving meaningful content
-const trimText = (text: string, maxLength: number) => {
-	if (text.length <= maxLength) return text;
-	return text.slice(0, maxLength).trim() + "..."; // Cut off and add "..." if too long
-};
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
 	try {
-		const { userInput } = await req.json();
-
-		if (!userInput || typeof userInput !== "string") {
-			return NextResponse.json({ error: "Missing or invalid input for image generation" }, { status: 400 });
+		const { userText } = await req.json();
+		if (!userText) {
+			return NextResponse.json({ error: "Missing required text input." }, { status: 400 });
 		}
 
-		// Ensure the total prompt length is ≤ 1000 characters
-		const basePrompt = "Generate a thematic image based on and describing the following: ";
-		const maxUserInputLength = 900 - basePrompt.length; // 1000 - 56 = 944
-
-		const trimmedUserInput = trimText(userInput, maxUserInputLength);
-
-		// Construct the final prompt
-		const prompt = `${basePrompt}${trimmedUserInput}`;
-
-		// Call OpenAI's image generation API
-		const response = await openai.images.generate({
-			prompt,
-			n: 1, // Generate one image
-			size: "1024x1024",
+		// 🌟 Step 1: Extract Theme using Chat Completions API
+		const chatCompletion = await openai.chat.completions.create({
+			model: "gpt-4-turbo",
+			messages: [
+				{ role: "system", content: "You are an AI that extracts key themes from text." },
+				{ role: "user", content: `Extract a **single clear theme** from the following text:\n\n${userText}` },
+			],
+			temperature: 0.7,
+			max_tokens: 50,
 		});
 
-		// Extract image URL
-		const imageUrl = response.data[0]?.url;
+		const extractedTheme = chatCompletion.choices[0]?.message?.content?.trim();
+		if (!extractedTheme) throw new Error("Failed to extract a valid theme.");
 
-		if (!imageUrl) {
-			throw new Error("No image URL returned from OpenAI");
-		}
+		// 🖼 Step 2: Generate Image using DALL·E 3
+		const imageResponse = await openai.images.generate({
+			// model: "dall-e-3",
+			prompt: `
+				Generate a **high-resolution, professional photograph** based on the theme: **"${extractedTheme}"**.
+				- The image must be **realistic and natural**, like a photo captured with a professional DSLR camera.
+				- Clear details, accurate lighting, natural shadows, and depth of field.
+				- Taken with a **Canon EOS 5D Mark IV, f/1.8 aperture, HDR mode enabled**.
+				- The subject should be **instantly recognizable and directly related to the theme**.
+				- The image should look like a **stock photo from Getty Images or Unsplash**.
+			`.trim(),
+			n: 1,
+			size: "1024x1024",
+			quality: "hd",
+		});
 
-		return NextResponse.json({ imageUrl });
+		const imageUrl = imageResponse.data[0]?.url;
+		if (!imageUrl) throw new Error("Failed to generate an image.");
+
+		// ✅ Return JSON response with extracted theme & generated image
+		return NextResponse.json({ theme: extractedTheme, imageUrl }, { status: 200 });
+
 	} catch (error: any) {
-		console.error("Image generation error:", error);
-		return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+		console.error("Error in route:", error.message);
+		return NextResponse.json({ error: error.message }, { status: 500 });
 	}
 }

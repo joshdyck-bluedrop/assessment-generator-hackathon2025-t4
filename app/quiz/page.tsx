@@ -408,7 +408,7 @@ export default function QuizPage() {
 					))}
 
 					{/* 🔥 Full-Screen Dark Overlay */}
-					<div className="absolute inset-0 bg-black/85"></div> {/* Ensures true opacity */}
+					<div className="absolute inset-0 bg-black/75"></div> {/* Ensures true opacity */}
 					<div className="absolute inset-0 backdrop-blur-md"></div> {/* Applies blur separately */}
 				</div>
 			)}

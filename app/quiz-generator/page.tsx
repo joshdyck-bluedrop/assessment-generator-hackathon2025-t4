@@ -159,7 +159,7 @@ export default function QuizGeneratorPage() {
 		fetch("/api/image-gen", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ userInput: content }),
+			body: JSON.stringify({ userText: content }),
 		})
 			.then((response) => {
 				if (!response.ok) throw new Error("Failed to generate image");
@@ -200,6 +200,19 @@ export default function QuizGeneratorPage() {
 			courseSections: prev.courseSections.filter((_, i) => i !== index),
 		}));
 	};
+
+	useEffect(() => {
+		// Remove all stored quiz section images from localStorage on page load
+		Object.keys(localStorage).forEach((key) => {
+			if (key.startsWith("quiz_section_") && key.endsWith("_image")) {
+				localStorage.removeItem(key);
+			}
+		});
+
+		// Remove stored quiz audience from localStorage
+		localStorage.removeItem("quizAudience");
+		localStorage.removeItem("quizData");
+	}, []);
 
 	// Start playing a witty complaint if loading takes longer than 5 seconds
 	useEffect(() => {
@@ -316,7 +329,7 @@ export default function QuizGeneratorPage() {
 				fetch("/api/image-gen", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ userInput: section.sectionContent }),
+					body: JSON.stringify({ userText: section.sectionContent }),
 				})
 					.then((response) => {
 						if (!response.ok) throw new Error("Failed to generate image");
