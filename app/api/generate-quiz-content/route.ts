@@ -10,7 +10,7 @@ interface QuizRequestBody {
 
 export async function POST(req: NextRequest) {
 	try {
-		const { apiModel }: QuizRequestBody =
+		const { apiModel, quizTitle }: QuizRequestBody =
 			await req.json();
 
 		// 🎲 Randomize Sections (2-4) & Questions per Section (3-6)
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
 		// 📝 AI Prompt (Force JSON Output)
 		const quizPrompt = `Generate a structured quiz with the following details:
-        - Title: Can be any topic
+        - Title: Can be any topic unless quizTitle is provided then use ${quizTitle}
         - Audience: Use randomly one of "Toddler", "Aussie Bloke", "French Aristocrat", "Surfer Dude", "Newfoundlander Bayman"
         - Difficulty: Can be one of "simple", "challenging" or "balanced mix of simple and challenging"
         - Answer Type: Can be one of "single" or "multiple"
