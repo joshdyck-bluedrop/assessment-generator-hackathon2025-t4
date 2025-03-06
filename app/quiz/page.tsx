@@ -53,6 +53,7 @@ export default function QuizPage() {
 	const [sectionImages, setSectionImages] = useState<string[]>([]);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [imageLoaded, setImageLoaded] = useState(false); // Prevents content from showing before images load
+	const [unansweredQuestions, setUnansweredQuestions] = useState<string[]>([]);
 
 	// 🎙️ List of encouragement phrases
 	const encouragementPhrases = [
@@ -173,6 +174,14 @@ export default function QuizPage() {
 				// Single select (radio buttons)
 				newAnswers = [answerText];
 			}
+
+			// Remove question from unansweredQuestions if it's now answered
+			setUnansweredQuestions((prevUnanswered) =>
+				prevUnanswered.includes(questionTitle)
+					? prevUnanswered.filter((q) => q !== questionTitle)
+					: prevUnanswered
+			);
+
 			return { ...prev, [questionTitle]: newAnswers };
 		});
 		// Increment trigger to activate useEffect
@@ -198,17 +207,34 @@ export default function QuizPage() {
 
 	// Submit answers and calculate results
 	const handleSubmit = () => {
+		// Get all questions from the quiz data
+		const allQuestions = quizData.courseSections.flatMap((section: any) =>
+			section.sectionQuestions.map((question: any) => question.questionTitle)
+		);
+	
+		// Find unanswered questions
+		const unanswered = allQuestions.filter((question: any) => !userAnswers[question] || userAnswers[question].length === 0);
+	
+		if (unanswered.length > 0) {
+			setUnansweredQuestions(unanswered); // Update state with unanswered questions
+			alert("Please answer all questions before submitting!");
+			return; // Stop submission
+		}
+	
+		// Clear previous validation errors
+		setUnansweredQuestions([]);
+	
 		let correctCount = 0;
 		const processedResults = quizData.courseSections.flatMap((section: any) =>
 			section.sectionQuestions.map((question: any) => {
 				const userSelected = userAnswers[question.questionTitle] || [];
 				const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
-
+	
 				// Check if all correct answers are selected and no incorrect ones
 				const isCorrect = correctAnswers.length === userSelected.length && userSelected.every((ans) => correctAnswers.includes(ans));
-
+	
 				if (isCorrect) correctCount += 1;
-
+	
 				return {
 					questionTitle: question.questionTitle,
 					answers: question.answers.map((answer: any) => ({
@@ -219,24 +245,21 @@ export default function QuizPage() {
 				};
 			})
 		);
-
+	
 		const totalQuestions = processedResults.length;
 		const calculatedScore = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-
+	
 		setScore(calculatedScore);
 		setResults({ score: calculatedScore, sectionQuestions: processedResults });
 		setSubmitted(true);
-
+	
 		// 🎉 Show confetti if score is 100%
 		if (calculatedScore === 100) {
 			setShowConfetti(true);
-
-			// Trigger confetti animation
 			launchConfetti();
-
-			setTimeout(() => setShowConfetti(false), 10000); // Hide confetti after 5 seconds
+			setTimeout(() => setShowConfetti(false), 10000); // Hide confetti after 10 seconds
 		}
-
+	
 		// 🗣 Play final affirmation
 		const finalPhrase = finalAffirmations[Math.floor(Math.random() * finalAffirmations.length)];
 		const audience = localStorage.getItem("quizAudience") || "default";
@@ -288,8 +311,11 @@ export default function QuizPage() {
 						const isMultiSelect = correctAnswers.length > 1;
 						const userSelected = userAnswers[question.questionTitle] || [];
 
+						// ❗ Apply red border if question is unanswered
+						const isUnanswered = unansweredQuestions.includes(question.questionTitle);
+
 						return (
-							<div key={qIndex} className="p-4 mt-2 rounded bg-gray-900">
+							<div key={qIndex} className={`p-4 mt-2 rounded bg-gray-900 ${isUnanswered ? "border-2 border-red-500" : ""}`}>
 								<p className="font-medium">{question.questionTitle}</p>
 								<div className="mt-2">
 									{question.answers.map((answer: any, aIndex: number) => {
