@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
                 {
                     "sectionTitle": "Example Section 1",
                     "numberOfQuestionsInSection": ${numQuestions},
-                    "sectionContent": "Brief description of the section."
+                    "sectionContent": "Brief description of the section. Must be at least 200 words"
                 },
             ]
         }
