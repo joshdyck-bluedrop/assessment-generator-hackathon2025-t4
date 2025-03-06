@@ -302,123 +302,125 @@ export default function QuizPage() {
 				<img src="/flag.png" alt="Checkered Flag" className="h-8 w-8 mr-3" />
 				<h1 className="text-2xl font-bold">Fast Track Assessments</h1>
 			</header>
-			<div className="p-6 max-w-2xl mx-auto text-white relative z-10">
-				{/* 🎉 Confetti Animation Overlay */}
-				{showConfetti && <div className="confetti-container"></div>}
+			<main className="flex-grow flex flex-col justify-center items-center p-6 max-w-2xl mx-auto w-full">
+			
+				<div className="p-6 max-w-2xl mx-auto text-white relative z-10">
+					{/* 🎉 Confetti Animation Overlay */}
+					{showConfetti && <div className="confetti-container"></div>}
 
-				<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
+					<h1 className="text-2xl font-bold">{quizData.quizTitle}</h1>
 
-				{/* Quiz Content */}
-				{quizData?.courseSections?.map((section: any, secIndex: number) => (
-					<div key={secIndex} className="mt-4">
-						<h2 className="text-xl font-semibold">{section.sectionTitle}</h2>
-						{section.sectionQuestions.map((question: any, qIndex: number) => {
-							const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
-							const isMultiSelect = correctAnswers.length > 1;
-							const userSelected = userAnswers[question.questionTitle] || [];
+					{/* Quiz Content */}
+					{quizData?.courseSections?.map((section: any, secIndex: number) => (
+						<div key={secIndex} className="mt-4">
+							<h2 className="text-xl font-semibold">{section.sectionTitle}</h2>
+							{section.sectionQuestions.map((question: any, qIndex: number) => {
+								const correctAnswers = question.answers.filter((a: any) => a.isCorrect).map((a: any) => a.answerText);
+								const isMultiSelect = correctAnswers.length > 1;
+								const userSelected = userAnswers[question.questionTitle] || [];
 
-							// ❗ Apply red border if question is unanswered
-							const isUnanswered = unansweredQuestions.includes(question.questionTitle);
+								// ❗ Apply red border if question is unanswered
+								const isUnanswered = unansweredQuestions.includes(question.questionTitle);
 
-							return (
-								<div key={qIndex} className={`p-4 mt-2 rounded bg-gray-900 ${isUnanswered ? "border-2 border-red-500" : ""}`}>
-									<p className="font-medium">{question.questionTitle}</p>
-									<div className="mt-2">
-										{question.answers.map((answer: any, aIndex: number) => {
-											const isSelected = userSelected.includes(answer.answerText);
-											const isCorrect = correctAnswers.includes(answer.answerText);
-											const isIncorrect = isSelected && !isCorrect;
+								return (
+									<div key={qIndex} className={`p-4 mt-2 rounded bg-gray-900 ${isUnanswered ? "border-2 border-red-500" : ""}`}>
+										<p className="font-medium">{question.questionTitle}</p>
+										<div className="mt-2">
+											{question.answers.map((answer: any, aIndex: number) => {
+												const isSelected = userSelected.includes(answer.answerText);
+												const isCorrect = correctAnswers.includes(answer.answerText);
+												const isIncorrect = isSelected && !isCorrect;
 
-											return (
-												<label
-													key={aIndex}
-													className={`flex p-2 mt-1 rounded cursor-pointer ${
-														submitted
-															? isCorrect
-																? "bg-green-600 text-white"
-																: isIncorrect
-																? "bg-red-600 text-white"
-																: "bg-gray-700 text-gray-300"
-															: "bg-gray-800 text-white hover:bg-gray-700"
-													}`}
-												>
-													{submitted && isIncorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CancelIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"></path></svg>}
-													{submitted && isCorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CheckCircleIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"></path></svg>}
-													{!submitted && (
-														<input
-															type={isMultiSelect ? "checkbox" : "radio"}
-															name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : `question-${secIndex}-${qIndex}`}
-															value={answer.answerText}
-															checked={isSelected}
-															onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
-															disabled={submitted} // Disable after submission
-															className="mr-2"
-														/>
-													)}
-													{answer.answerText} {submitted && isSelected && '(Your Answer)'}
-												</label>
-											);
-										})}
+												return (
+													<label
+														key={aIndex}
+														className={`flex p-2 mt-1 rounded cursor-pointer ${
+															submitted
+																? isCorrect
+																	? "bg-green-600 text-white"
+																	: isIncorrect
+																	? "bg-red-600 text-white"
+																	: "bg-gray-700 text-gray-300"
+																: "bg-gray-800 text-white hover:bg-gray-700"
+														}`}
+													>
+														{submitted && isIncorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CancelIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"></path></svg>}
+														{submitted && isCorrect && <svg width="25" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CheckCircleIcon" style={{fill: "#fff", paddingRight: 4}}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"></path></svg>}
+														{!submitted && (
+															<input
+																type={isMultiSelect ? "checkbox" : "radio"}
+																name={isMultiSelect ? `${question.questionTitle}-${aIndex}` : `question-${secIndex}-${qIndex}`}
+																value={answer.answerText}
+																checked={isSelected}
+																onChange={() => handleAnswerChange(question.questionTitle, answer.answerText, isMultiSelect)}
+																disabled={submitted} // Disable after submission
+																className="mr-2"
+															/>
+														)}
+														{answer.answerText} {submitted && isSelected && '(Your Answer)'}
+													</label>
+												);
+											})}
+										</div>
 									</div>
-								</div>
-							);
-						})}
-					</div>
-				))}
+								);
+							})}
+						</div>
+					))}
 
-				{/* Submit & Results */}
-				{!submitted && (
-					<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-						Submit Answers
-					</button>
-				)}
-
-				{submitted && (
-					<div className="mt-8">
-						{/* Large SCORE Display */}
-						<h1 className="text-6xl font-bold text-center">SCORE: {score}%</h1>
-
-						{/* Results in Preformatted JSON Format */}
-						{/* <div className="mt-4 p-4 bg-gray-800 rounded">
-							<h2 className="text-lg font-semibold">Results</h2>
-							<pre className="text-xs overflow-x-auto">{JSON.stringify(results, null, 2)}</pre>
-						</div> */}
-
-						{/* ✅ Download JSON Button */}
-						<button
-							onClick={downloadResultsAsJSON}
-							className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
-						>
-							⬇ Download JSON
+					{/* Submit & Results */}
+					{!submitted && (
+						<button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+							Submit Answers
 						</button>
+					)}
 
-						<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full">
-							🔄 Generate New Quiz
-						</button>
-					</div>
-				)}
+					{submitted && (
+						<div className="mt-8">
+							{/* Large SCORE Display */}
+							<h1 className="text-6xl font-bold text-center">SCORE: {score}%</h1>
 
-				{/* 📸 Background Slideshow (Moved Below the Content) */}
-				{sectionImages.length > 0 && (
-					<div className="fixed inset-0 -z-10">
-						{/* 📸 Full-Screen Background Slideshow */}
-						{sectionImages.map((image, index) => (
-							<img
-								key={index}
-								src={image}
-								alt="Background"
-								className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-									index === currentImageIndex ? "opacity-100" : "opacity-0"
-								}`}
-							/>
-						))}
+							{/* Results in Preformatted JSON Format */}
+							{/* <div className="mt-4 p-4 bg-gray-800 rounded">
+								<h2 className="text-lg font-semibold">Results</h2>
+								<pre className="text-xs overflow-x-auto">{JSON.stringify(results, null, 2)}</pre>
+							</div> */}
 
-						{/* 🔥 Full-Screen Dark Overlay */}
-						<div className="absolute inset-0 bg-black/75"></div> {/* Ensures true opacity */}
-						<div className="absolute inset-0 backdrop-blur-md"></div> {/* Applies blur separately */}
-					</div>
-				)}
-			</div>
+							{/* ✅ Download JSON Button */}
+							<button
+								onClick={downloadResultsAsJSON}
+								className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
+							>
+								⬇ Download JSON
+							</button>
+
+							<button onClick={() => router.push("/quiz-generator")} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full">
+								🔄 Generate New Quiz
+							</button>
+						</div>
+					)}
+
+					{/* 📸 Background Slideshow (Moved Below the Content) */}
+					{sectionImages.length > 0 && (
+						<div className="fixed inset-0 -z-10">
+							{/* 📸 Full-Screen Background Slideshow */}
+							{sectionImages.map((image, index) => (
+								<img
+									key={index}
+									src={image}
+									alt="Background"
+									className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+										index === currentImageIndex ? "opacity-100" : "opacity-0"
+									}`}
+								/>
+							))}
+
+							{/* 🔥 Full-Screen Dark Overlay */}
+							<div className="absolute inset-0 bg-black/75"></div> {/* Ensures true opacity */}
+						</div>
+					)}
+				</div>
+			</main>
 			<footer className="w-full py-4 px-6 text-right text-gray-400 text-sm z-20">
 				Powered by <span className="text-white font-semibold">JATT25 Pit Stop Legends</span>
 			</footer>
