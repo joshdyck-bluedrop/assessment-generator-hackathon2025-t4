@@ -91,7 +91,7 @@ export async function POST(req: Request) {
         `;
 
 		const response = await openai.chat.completions.create({
-			model: "gpt-4",
+			model: "gpt-4-turbo",
 			messages: [{ role: "system", content: "You are an expert AI that generates high-quality quiz questions." }, { role: "user", content: prompt }],
 			temperature: 0.7,
 			max_tokens: 2000,
