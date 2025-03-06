@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     5. **DO NOT** include explanations or additional text. **Return ONLY VALID JSON**.
     6. **DO NOT** include markdown formatting (such as \`\`\`json).
     7. **DO NOT** allow duplicate questions.
-    8. **THE AUDIENCE STYLE IS CRITICAL!** All questions should be **written in the dialect, tone, and vocabulary of the audience**. However, slang should **not break JSON structure or readability**.
+    8. All questions should be **written in the dialect, tone, and vocabulary of the audience**. However, slang should **not break JSON structure or readability**. DO NOT change the question, just modify the linguistic style.
     9. **Ensure that all answers are strictly derived from the section content**.
     10. **For "challenging" difficulty**, make answers inferential rather than explicitly stated.
     11. **For "simple" difficulty**, use facts explicitly present in sectionContent.
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 			model: "gpt-4-turbo",
 			messages: [{ role: "system", content: "You are an expert AI that generates high-quality quiz questions." }, { role: "user", content: prompt }],
 			temperature: 0.7,
-			max_tokens: 4000,
+			max_tokens: 8000,
 		});
 
 		const aiResponse = response.choices[0].message?.content?.trim();
